@@ -28,6 +28,24 @@ build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
 build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
 
+[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/Components/LogInPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.LogInPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components\LogInPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components\LogInPage.xaml
+
+[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/Components/SignUpPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.SignUpPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components\SignUpPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components\SignUpPage.xaml
+
+[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/Components/WelcomePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.WelcomePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components\WelcomePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components\WelcomePage.xaml
+
 [C:/Users/Grace/source/repos/MauiApp3/MauiApp3/MainPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.MainPage.xaml
