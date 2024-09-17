@@ -12,36 +12,54 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = MauiApp3
-build_property.ProjectDir = C:\Users\Grace\source\repos\MauiApp3\MauiApp3\
+build_property.ProjectDir = /Users/ericwang/Desktop/Maui/TimeTrackerDesktop/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 
-[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/App.xaml]
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/App.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.App.xaml
 build_metadata.AdditionalFiles.TargetPath = App.xaml
 build_metadata.AdditionalFiles.RelativePath = App.xaml
 
-[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/AppShell.xaml]
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/AppShell.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
 build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
 
-[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/MainPage.xaml]
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/Components/LogInPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.LogInPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components/LogInPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components/LogInPage.xaml
+
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/Components/SignInPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.SignInPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components/SignInPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components/SignInPage.xaml
+
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/Components/WelcomePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Components.WelcomePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Components/WelcomePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Components/WelcomePage.xaml
+
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/MainPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
 build_metadata.AdditionalFiles.RelativePath = MainPage.xaml
 
-[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/Resources/Styles/Colors.xaml]
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Resources.Styles.Colors.xaml
-build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
-build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Colors.xaml
+build_metadata.AdditionalFiles.TargetPath = Resources/Styles/Colors.xaml
+build_metadata.AdditionalFiles.RelativePath = Resources/Styles/Colors.xaml
 
-[C:/Users/Grace/source/repos/MauiApp3/MauiApp3/Resources/Styles/Styles.xaml]
+[/Users/ericwang/Desktop/Maui/TimeTrackerDesktop/Resources/Styles/Styles.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = MauiApp3.Resources.Styles.Styles.xaml
-build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml
-build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Styles.xaml
+build_metadata.AdditionalFiles.TargetPath = Resources/Styles/Styles.xaml
+build_metadata.AdditionalFiles.RelativePath = Resources/Styles/Styles.xaml
