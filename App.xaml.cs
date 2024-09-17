@@ -1,12 +1,12 @@
-﻿namespace MauiApp3
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
+﻿namespace MauiApp3;
 
-            MainPage = new AppShell();
-        }
+public partial class App : Application
+{
+    public App()
+    {
+        InitializeComponent();
+
+        // Set the WelcomePage as the starting page
+        MainPage = new NavigationPage(new WelcomePage());
     }
 }
