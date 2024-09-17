@@ -1,0 +1,26 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp3.LogInPage"
+             Title="Log In">
+
+    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+        <Label Text="Log In"
+               FontSize="Large"
+               HorizontalOptions="Center" />
+
+        <Entry Placeholder="Enter your username"
+               WidthRequest="300"
+               Margin="0, 20, 0, 0"/>
+
+        <Entry Placeholder="Enter your password"
+               IsPassword="True"
+               WidthRequest="300"/>
+
+        <Button Text="Log In"
+                WidthRequest="200"
+                HeightRequest="50"
+                BackgroundColor="#34C759"
+                TextColor="White"
+                Margin="0, 20, 0, 0"/>
+    </StackLayout>
+</ContentPage>
