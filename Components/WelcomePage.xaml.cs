@@ -11,7 +11,7 @@ namespace MauiApp3{ // Ensure the namespace matches the one in XAML
         private async void OnSignInClicked(object sender, EventArgs e)
         {
             // Add logic for Sign In button click here, for example, navigate to the SignInPage
-            await Navigation.PushAsync(new SignInPage());
+            await Navigation.PushAsync(new SignUpPage());
         }
 
         private async void OnLogInClicked(object sender, EventArgs e)

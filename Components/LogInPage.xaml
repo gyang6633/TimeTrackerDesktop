@@ -30,12 +30,17 @@
                WidthRequest="300"
                Margin="0, 10, 0, 15"/>
         
-        <Label Text="No account yet? Register here!"
-           FontSize="Micro"
-           FontAttributes="Bold"
-           FontFamily="Arial"
-           TextColor="#6200EA"
-           HorizontalOptions="Center"/>     
+       <Label Text="Already have an account? Log in here!"
+              FontSize="Micro"
+              FontAttributes="Bold"
+              FontFamily="Arial"
+              TextColor="#6200EA"
+              HorizontalOptions="Center"
+              Margin="0, 10, 0, 0">
+              <Label.GestureRecognizers>
+                     <TapGestureRecognizer Tapped="OnLoginLabelTapped" />
+              </Label.GestureRecognizers>
+       </Label>
 
         <Button Text="Login"
                 FontFamily="Arial"
