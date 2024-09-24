@@ -6,20 +6,24 @@
     <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
         <Label Text="Time Tracker"
                TextColor="White"
+               FontFamily="Arial"
                FontSize="Large"
                FontAttributes="Bold"
                HorizontalOptions="Center"
                Margin="0, 0, 0, 20"/>
 
-        <Label Text="Email Address"
-               TextColor="White"/>
-        <Entry Placeholder="Enter your email"
+        <Label Text="NetID"
+               TextColor="White"
+               FontFamily="Arial"
+               />
+        <Entry Placeholder="Enter Your NetId"
                WidthRequest="300"
                BackgroundColor="White"
                Margin="0, 10, 0, 15"/>
 
         <Label Text="Password"
-               TextColor="White"/>
+               TextColor="White"
+               FontFamily="Arial"/>
         <Entry Placeholder="Enter your password"
                IsPassword="True"
                BackgroundColor="White"
@@ -28,10 +32,13 @@
         
         <Label Text="No account yet? Register here!"
            FontSize="Micro"
+           FontAttributes="Bold"
+           FontFamily="Arial"
            TextColor="#6200EA"
            HorizontalOptions="Center"/>     
 
         <Button Text="Login"
+                FontFamily="Arial"
                 FontAttributes="Bold"
                 WidthRequest="200"
                 HeightRequest="50"
