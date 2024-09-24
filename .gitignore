@@ -1,8 +1,8 @@
-/bin/
-/obj/
-/Platforms/
-/Properties/
-/Resources/
+obj/
+bin/
+Platforms/
+Properties/
+Resources/
 .sln
 .csproj
 .csproj.user
