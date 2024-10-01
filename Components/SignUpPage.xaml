@@ -5,7 +5,7 @@
 
     <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
         <!-- Page Title -->
-        <Label Text="Sign Up"
+        <Label Text="Set Password"
                TextColor="White"
                FontFamily="Arial"
                FontSize="Large"
