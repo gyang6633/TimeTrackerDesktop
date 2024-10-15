@@ -65,7 +65,10 @@ namespace MauiApp3.Components
                     var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
                     if (result.requiresPasswordChange)
                     {
-                        await _page.DisplayAlert("Login", "Password change required", "OK");
+                        //await _page.DisplayAlert("Login", "Password change required", "OK");
+
+                        // Navigate to SignUpPage when password change is required
+                        await _page.Navigation.PushAsync(new SignUpPage());
                     }
                     else
                     {
@@ -75,15 +78,14 @@ namespace MauiApp3.Components
                 else
                 {
                     var error = await response.Content.ReadAsStringAsync();
-                    await _page.DisplayAlert("Error 1", error, "OK");
+                    await _page.DisplayAlert("Error", error, "OK");
                 }
             }
             catch (Exception ex)
             {
-                await _page.DisplayAlert("Error 2", ex.Message, "OK");
+                await _page.DisplayAlert("Error", ex.Message, "OK");
             }
         }
-
     }
 
     public class LoginResponse
