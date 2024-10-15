@@ -19,6 +19,7 @@
                FontFamily="Arial"/>
         <Entry x:Name="emailEntry"
                Placeholder="Enter Your NetID"
+               Text = "{Binding Email}"
                WidthRequest="300"
                BackgroundColor="White"
                Margin="0, 10, 0, 15"/>
@@ -30,6 +31,7 @@
         <Entry x:Name="passwordEntry"
                Placeholder="Enter your password"
                IsPassword="True"
+               Text = "{Binding Password}"
                BackgroundColor="White"
                WidthRequest="300"
                Margin="0, 10, 0, 15"/>
@@ -41,20 +43,21 @@
         <Entry x:Name="confirmPasswordEntry"
                Placeholder="Confirm your password"
                IsPassword="True"
+               Text = "{Binding ConfirmPassword}"
                BackgroundColor="White"
                WidthRequest="300"
                Margin="0, 10, 0, 15"/>
 
         <!-- Sign Up Button -->
         <Button Text="Sign Up"
+                Command="{Binding SignUpCommand}"
                 FontFamily="Arial"
                 FontAttributes="Bold"
                 WidthRequest="200"
                 HeightRequest="50"
                 BackgroundColor="#6200EA"
                 TextColor="White"
-                Margin="0, 20, 0, 0"
-                Clicked="OnSignUpButtonClicked"/>
+                Margin="0, 20, 0, 0"/>
 
         <!-- Already have an account? -->
         <Label FontSize="Micro"
@@ -71,9 +74,6 @@
                       FontAttributes="Bold"/>
                         </FormattedString>
                     </Label.FormattedText>
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLoginLabelTapped" />
-                    </Label.GestureRecognizers>
                 </Label>
     </StackLayout>
 </ContentPage>
