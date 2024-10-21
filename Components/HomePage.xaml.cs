@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
 using Microsoft.Maui.Controls;
 
 namespace MauiApp3
@@ -9,6 +10,7 @@ namespace MauiApp3
     {
         public ObservableCollection<Section> Sections { get; set; }
         private Section _selectedSection;
+        private DateTime _selectedWeekStartDate;
 
         // Property for the currently selected section
         public Section SelectedSection
@@ -21,6 +23,22 @@ namespace MauiApp3
                 PopulateStudentHoursGrid();  // Populate the grid when a new section is selected
             }
         }
+
+        // Property for the currently selected week's start date
+        public DateTime SelectedWeekStartDate
+        {
+            get => _selectedWeekStartDate;
+            set
+            {
+                _selectedWeekStartDate = value;
+                OnPropertyChanged(nameof(SelectedWeekStartDate));
+                PopulateStudentHoursGrid();  // Re-populate the grid based on the new week
+            }
+        }
+
+        // Commands for navigating between weeks
+        public ICommand PreviousWeekCommand { get; }
+        public ICommand NextWeekCommand { get; }
 
         public HomePage()
         {
@@ -42,9 +60,24 @@ namespace MauiApp3
             {
                 SelectedSection = Sections[0];
             }
+
+            // Set initial selected week as the current week
+            SelectedWeekStartDate = GetStartOfWeek(DateTime.Now);
+
+            // Define commands for week navigation
+            PreviousWeekCommand = new Command(() => SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7));
+            NextWeekCommand = new Command(() => SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7));
         }
 
-        // Method to populate the grid based on the selected section
+        // Method to get the start of the week
+        private DateTime GetStartOfWeek(DateTime date)
+        {
+            // Assuming the week starts on Monday
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+            return date.AddDays(-diff).Date;
+        }
+
+        // Method to populate the grid based on the selected section and week
         private void PopulateStudentHoursGrid()
         {
             // Clear any previous data in the grid
@@ -70,10 +103,11 @@ namespace MauiApp3
             AddToGrid(new Label { Text = "Hours Worked", FontAttributes = FontAttributes.Bold }, 2, 0);
             AddToGrid(new Label { Text = "Cumulative Hours", FontAttributes = FontAttributes.Bold }, 3, 0);
 
-            // Populate grid with student data
+            // Populate grid with student data for the selected week
             for (int row = 0; row < SelectedSection.Students.Count; row++)
             {
                 var student = SelectedSection.Students[row];
+                var hoursForWeek = GetHoursForSelectedWeek(student);
 
                 // Add a row definition for each student
                 StudentHoursGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -81,7 +115,7 @@ namespace MauiApp3
                 // Add student data to the grid
                 AddToGrid(new Label { Text = student.Group }, 0, row + 1); // Group
                 AddToGrid(new Label { Text = student.Name }, 1, row + 1);  // Names
-                AddToGrid(new Label { Text = student.HoursWorked[0].ToString() }, 2, row + 1); // Hours Worked
+                AddToGrid(new Label { Text = hoursForWeek.ToString() }, 2, row + 1); // Hours Worked for selected week
                 AddToGrid(new Label { Text = student.CumulativeHours.ToString() }, 3, row + 1); // Cumulative Hours
             }
         }
@@ -92,6 +126,14 @@ namespace MauiApp3
             StudentHoursGrid.Children.Add(view);
             Grid.SetColumn(view, column);
             Grid.SetRow(view, row);
+        }
+
+        // Sample method to get hours worked by a student in the selected week
+        private int GetHoursForSelectedWeek(Student student)
+        {
+            // Assume each student has hours worked for different weeks stored in HoursWorked list.
+            // This is a placeholder logic. Adjust it according to how you're storing hours.
+            return student.HoursWorked.FirstOrDefault();
         }
 
         // Sample data generation
@@ -116,7 +158,7 @@ namespace MauiApp3
         {
             public string Name { get; set; }
             public string Group { get; set; }
-            public List<int> HoursWorked { get; set; }
+            public List<int> HoursWorked { get; set; }  // Hours worked for different weeks
             public int CumulativeHours { get; set; }
         }
     }

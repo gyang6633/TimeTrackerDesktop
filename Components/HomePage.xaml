@@ -1,39 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp3.HomePage"
-             Title="Student Hours Log">
+             x:Class="MauiApp3.HomePage">
 
-    <Grid Padding="10">
-        <!-- First Column: Sections -->
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <StackLayout Padding="10">
+        <!-- Calendar/Week Picker Section -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Sections List (Left side) -->
-        <CollectionView Grid.Column="0"
-                        x:Name="SectionsCollectionView"
-                        ItemsSource="{Binding Sections}"
-                        SelectionMode="Single"
-                        SelectedItem="{Binding SelectedSection}">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout>
-                        <Label Text="{Binding SectionName}" 
-                               FontSize="Large"
-                               BackgroundColor="LightBlue"
-                               Padding="10"/>
-                    </StackLayout>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+            <!-- Previous Week Button -->
+            <Button Text="Previous" Command="{Binding PreviousWeekCommand}" Grid.Column="0" />
 
-        <!-- Main Grid (Right side) -->
-        <ScrollView Grid.Column="1" Orientation="Both">
-            <Grid x:Name="StudentHoursGrid" ColumnSpacing="10" RowSpacing="10" Padding="10">
-                <!-- Define your grid columns and rows dynamically in code-behind -->
-            </Grid>
-        </ScrollView>
-    </Grid>
+            <!-- Week Start Date Picker -->
+            <DatePicker x:Name="WeekStartDatePicker" Date="{Binding SelectedWeekStartDate, Mode=TwoWay}" Grid.Column="1" HorizontalOptions="Center" />
+
+            <!-- Next Week Button -->
+            <Button Text="Next" Command="{Binding NextWeekCommand}" Grid.Column="2" />
+        </Grid>
+
+        <!-- Section Picker -->
+        <Picker Title="Select Section" ItemsSource="{Binding Sections}" ItemDisplayBinding="{Binding SectionName}" SelectedItem="{Binding SelectedSection}" />
+
+        <!-- Student Hours Grid -->
+        <Grid x:Name="StudentHoursGrid" Padding="10">
+            <!-- The student hours grid will be populated dynamically from code-behind -->
+        </Grid>
+    </StackLayout>
 </ContentPage>
