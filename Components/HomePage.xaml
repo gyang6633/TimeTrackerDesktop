@@ -1,8 +1,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp3.HomePage">
+             x:Class="MauiApp3.HomePage"
+             x:Name="HomePageInstance">
 
-    <StackLayout Padding="10">
+    <StackLayout Padding="25" Spacing="25">
+        <!-- Week Range Display Label -->
+        <Label Text="{Binding WeekRangeDisplay, StringFormat='Week of {0}'}" 
+               HorizontalOptions="Center" 
+               FontAttributes="Bold"
+               FontSize="Medium" />
+
         <!-- Calendar/Week Picker Section -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -12,17 +19,37 @@
             </Grid.ColumnDefinitions>
 
             <!-- Previous Week Button -->
-            <Button Text="Previous" Command="{Binding PreviousWeekCommand}" Grid.Column="0" />
+            <Button x:Name="PreviousWeekButton"
+                    Text="Previous Week" 
+                    Command="{Binding PreviousWeekCommand}" 
+                    Grid.Column="0" />
 
-            <!-- Week Start Date Picker -->
-            <DatePicker x:Name="WeekStartDatePicker" Date="{Binding SelectedWeekStartDate, Mode=TwoWay}" Grid.Column="1" HorizontalOptions="Center" />
+            <!-- Date Picker for Selecting the Week's Start Date -->
+            <DatePicker x:Name="WeekStartDatePicker"
+                        Date="{Binding SelectedWeekStartDate, Mode=TwoWay}"
+                        Grid.Column="1"
+                        HorizontalOptions="Center" />
 
             <!-- Next Week Button -->
-            <Button Text="Next" Command="{Binding NextWeekCommand}" Grid.Column="2" />
+            <Button x:Name="NextWeekButton"
+                    Text="Next Week" 
+                    Command="{Binding NextWeekCommand}" 
+                    Grid.Column="2" />
         </Grid>
 
         <!-- Section Picker -->
-        <Picker Title="Select Section" ItemsSource="{Binding Sections}" ItemDisplayBinding="{Binding SectionName}" SelectedItem="{Binding SelectedSection}" />
+        <Picker Title="Select Class Section" 
+                ItemsSource="{Binding Sections}" 
+                ItemDisplayBinding="{Binding SectionName}" 
+                SelectedItem="{Binding SelectedSection}" />
+
+        <!-- Debug label to verify selected section
+        <Label Text="{Binding SelectedSection.SectionName}"
+           HorizontalOptions="Center"
+           FontAttributes="Italic"
+           FontSize="Small"
+           TextColor="Gray" /> -->
+        
 
         <!-- Student Hours Grid -->
         <Grid x:Name="StudentHoursGrid" Padding="10">

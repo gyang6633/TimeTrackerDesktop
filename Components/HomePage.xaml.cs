@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
 
 namespace MauiApp3
 {
-    public partial class HomePage : ContentPage
+    public partial class HomePage : ContentPage, INotifyPropertyChanged
     {
         public ObservableCollection<Section> Sections { get; set; }
         private Section _selectedSection;
         private DateTime _selectedWeekStartDate;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         // Property for the currently selected section
         public Section SelectedSection
@@ -19,8 +27,8 @@ namespace MauiApp3
             set
             {
                 _selectedSection = value;
-                OnPropertyChanged(nameof(SelectedSection));  // Notify of property change for UI binding
-                PopulateStudentHoursGrid();  // Populate the grid when a new section is selected
+                OnPropertyChanged(nameof(SelectedSection));
+                PopulateStudentHoursGrid();
             }
         }
 
@@ -30,10 +38,23 @@ namespace MauiApp3
             get => _selectedWeekStartDate;
             set
             {
-                _selectedWeekStartDate = value;
-                OnPropertyChanged(nameof(SelectedWeekStartDate));
-                PopulateStudentHoursGrid();  // Re-populate the grid based on the new week
+                if (_selectedWeekStartDate != value)
+                {
+                    _selectedWeekStartDate = value;
+                    OnPropertyChanged(nameof(SelectedWeekStartDate));
+                    UpdateWeekRangeDisplay();
+                    PopulateStudentHoursGrid();
+                }
             }
+        }
+
+        // Property for displaying the week range as text
+        public string WeekRangeDisplay { get; private set; }
+
+        private void UpdateWeekRangeDisplay()
+        {
+            WeekRangeDisplay = $"{GetStartOfWeek(SelectedWeekStartDate):MM/dd/yyyy} - {GetEndOfWeek(SelectedWeekStartDate):MM/dd/yyyy}";
+            OnPropertyChanged(nameof(WeekRangeDisplay));
         }
 
         // Commands for navigating between weeks
@@ -44,83 +65,141 @@ namespace MauiApp3
         {
             InitializeComponent();
 
-            // Initialize sample data
+            // Initialize sections with sample data
             Sections = new ObservableCollection<Section>
             {
-                new Section { SectionName = "001", Students = GetSampleStudents("78") },
-                new Section { SectionName = "002", Students = GetSampleStudents("79") },
-                new Section { SectionName = "003", Students = GetSampleStudents("80") }
+                new Section
+                {
+                    SectionName = "4485.001",
+                    Groups = new ObservableCollection<StudentGroup>
+                    {
+                        new StudentGroup
+                        {
+                            GroupName = "78",
+                            Students = new ObservableCollection<Student>
+                            {
+                                new Student { FirstName = "Alex", LastName = "Johnson", WeeklyHours = new List<int> { 5, 6, 4, 3 }, CumulativeHours = 50 },
+                                new Student { FirstName = "Jessica", LastName = "Lee", WeeklyHours = new List<int> { 3, 4, 5, 2 }, CumulativeHours = 45 },
+                                new Student { FirstName = "Tom", LastName = "Brown", WeeklyHours = new List<int> { 6, 5, 4, 7 }, CumulativeHours = 60 }
+                            }
+                        },
+                        new StudentGroup
+                        {
+                            GroupName = "79",
+                            Students = new ObservableCollection<Student>
+                            {
+                                new Student { FirstName = "Liam", LastName = "Smith", WeeklyHours = new List<int> { 4, 5, 6, 5 }, CumulativeHours = 55 },
+                                new Student { FirstName = "Sophia", LastName = "Wilson", WeeklyHours = new List<int> { 2, 3, 4, 3 }, CumulativeHours = 35 },
+                                new Student { FirstName = "Olivia", LastName = "Davis", WeeklyHours = new List<int> { 5, 4, 6, 5 }, CumulativeHours = 50 }
+                            }
+                        }
+                    }
+                },
+                new Section
+                {
+                    SectionName = "4485.002",
+                    Groups = new ObservableCollection<StudentGroup>
+                    {
+                        new StudentGroup
+                        {
+                            GroupName = "80",
+                            Students = new ObservableCollection<Student>
+                            {
+                                new Student { FirstName = "Noah", LastName = "Moore", WeeklyHours = new List<int> { 3, 4, 5, 4 }, CumulativeHours = 45 },
+                                new Student { FirstName = "Emma", LastName = "White", WeeklyHours = new List<int> { 6, 5, 7, 6 }, CumulativeHours = 65 },
+                                new Student { FirstName = "William", LastName = "Harris", WeeklyHours = new List<int> { 4, 3, 4, 5 }, CumulativeHours = 40 }
+                            }
+                        },
+                        new StudentGroup
+                        {
+                            GroupName = "81",
+                            Students = new ObservableCollection<Student>
+                            {
+                                new Student { FirstName = "Ava", LastName = "Martinez", WeeklyHours = new List<int> { 2, 4, 3, 4 }, CumulativeHours = 35 },
+                                new Student { FirstName = "Ethan", LastName = "Garcia", WeeklyHours = new List<int> { 5, 6, 5, 4 }, CumulativeHours = 55 },
+                                new Student { FirstName = "Mason", LastName = "Martinez", WeeklyHours = new List<int> { 4, 4, 4, 5 }, CumulativeHours = 40 }
+                            }
+                        }
+                    }
+                }
             };
 
-            // Set BindingContext after initializing data
             BindingContext = this;
 
-            // Preselect the first section
             if (Sections.Count > 0)
             {
                 SelectedSection = Sections[0];
             }
 
-            // Set initial selected week as the current week
             SelectedWeekStartDate = GetStartOfWeek(DateTime.Now);
 
-            // Define commands for week navigation
-            PreviousWeekCommand = new Command(() => SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7));
-            NextWeekCommand = new Command(() => SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7));
+            PreviousWeekCommand = new Command(() =>
+            {
+                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7);
+            });
+
+            NextWeekCommand = new Command(() =>
+            {
+                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7);
+            });
+
+            UpdateWeekRangeDisplay();
         }
 
-        // Method to get the start of the week
         private DateTime GetStartOfWeek(DateTime date)
         {
-            // Assuming the week starts on Monday
             int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
             return date.AddDays(-diff).Date;
         }
 
-        // Method to populate the grid based on the selected section and week
+        private DateTime GetEndOfWeek(DateTime date)
+        {
+            return GetStartOfWeek(date).AddDays(6);
+        }
+
         private void PopulateStudentHoursGrid()
         {
-            // Clear any previous data in the grid
             StudentHoursGrid.Children.Clear();
             StudentHoursGrid.ColumnDefinitions.Clear();
             StudentHoursGrid.RowDefinitions.Clear();
 
-            // If no section is selected, do not proceed
             if (SelectedSection == null) return;
 
-            // Define columns for the grid: Group, Names, Hours Worked, Cumulative Hours
+            StudentHoursGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             StudentHoursGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             StudentHoursGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             StudentHoursGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             StudentHoursGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            // Add row for headers
             StudentHoursGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            // Add headers
-            AddToGrid(new Label { Text = "Group", FontAttributes = FontAttributes.Bold }, 0, 0);
-            AddToGrid(new Label { Text = "Names", FontAttributes = FontAttributes.Bold }, 1, 0);
-            AddToGrid(new Label { Text = "Hours Worked", FontAttributes = FontAttributes.Bold }, 2, 0);
-            AddToGrid(new Label { Text = "Cumulative Hours", FontAttributes = FontAttributes.Bold }, 3, 0);
+            AddToGrid(new Label { Text = "Group", FontAttributes = FontAttributes.Bold, Padding = new Thickness(10, 0), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 0, 0);
+            AddToGrid(new Label { Text = "First Name", FontAttributes = FontAttributes.Bold, Padding = new Thickness(10, 0), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 1, 0);
+            AddToGrid(new Label { Text = "Last Name", FontAttributes = FontAttributes.Bold, Padding = new Thickness(10, 0), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 2, 0);
+            AddToGrid(new Label { Text = "Total Hours for the Week", FontAttributes = FontAttributes.Bold, Padding = new Thickness(10, 0), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 3, 0);
+            AddToGrid(new Label { Text = "Cumulative Total Hours", FontAttributes = FontAttributes.Bold, Padding = new Thickness(10, 0), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 4, 0);
 
-            // Populate grid with student data for the selected week
-            for (int row = 0; row < SelectedSection.Students.Count; row++)
+            int currentRow = 1;
+
+            foreach (var group in SelectedSection.Groups)
             {
-                var student = SelectedSection.Students[row];
-                var hoursForWeek = GetHoursForSelectedWeek(student);
+                foreach (var student in group.Students)
+                {
+                    var hoursForWeek = GetHoursForSelectedWeek(student);
 
-                // Add a row definition for each student
-                StudentHoursGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                    StudentHoursGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                // Add student data to the grid
-                AddToGrid(new Label { Text = student.Group }, 0, row + 1); // Group
-                AddToGrid(new Label { Text = student.Name }, 1, row + 1);  // Names
-                AddToGrid(new Label { Text = hoursForWeek.ToString() }, 2, row + 1); // Hours Worked for selected week
-                AddToGrid(new Label { Text = student.CumulativeHours.ToString() }, 3, row + 1); // Cumulative Hours
+                    AddToGrid(new Label { Text = group.GroupName, HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 0, currentRow);
+                    AddToGrid(new Label { Text = student.FirstName, HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 1, currentRow);
+                    AddToGrid(new Label { Text = student.LastName, HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 2, currentRow);
+                    AddToGrid(new Label { Text = hoursForWeek.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 3, currentRow);
+                    AddToGrid(new Label { Text = student.CumulativeHours.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Colors.Black }, 4, currentRow);
+
+                    currentRow++;
+                }
             }
         }
 
-        // Helper method to add views to the grid
         private void AddToGrid(View view, int column, int row)
         {
             StudentHoursGrid.Children.Add(view);
@@ -128,37 +207,28 @@ namespace MauiApp3
             Grid.SetRow(view, row);
         }
 
-        // Sample method to get hours worked by a student in the selected week
         private int GetHoursForSelectedWeek(Student student)
         {
-            // Assume each student has hours worked for different weeks stored in HoursWorked list.
-            // This is a placeholder logic. Adjust it according to how you're storing hours.
-            return student.HoursWorked.FirstOrDefault();
+            return student.WeeklyHours.FirstOrDefault();
         }
 
-        // Sample data generation
-        private ObservableCollection<Student> GetSampleStudents(string group)
-        {
-            return new ObservableCollection<Student>
-            {
-                new Student { Name = "Chris", Group = group, HoursWorked = new List<int> { 4 }, CumulativeHours = 20 },
-                new Student { Name = "Grace", Group = group, HoursWorked = new List<int> { 2 }, CumulativeHours = 22 },
-                new Student { Name = "Eric", Group = group, HoursWorked = new List<int> { 1 }, CumulativeHours = 24 },
-            };
-        }
-
-        // Classes for section and student data
         public class Section
         {
             public string SectionName { get; set; }
+            public ObservableCollection<StudentGroup> Groups { get; set; }
+        }
+
+        public class StudentGroup
+        {
+            public string GroupName { get; set; }
             public ObservableCollection<Student> Students { get; set; }
         }
 
         public class Student
         {
-            public string Name { get; set; }
-            public string Group { get; set; }
-            public List<int> HoursWorked { get; set; }  // Hours worked for different weeks
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public List<int> WeeklyHours { get; set; }
             public int CumulativeHours { get; set; }
         }
     }
