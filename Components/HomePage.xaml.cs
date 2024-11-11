@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using MauiApp3.Components;
 
 namespace MauiApp3
 {
@@ -124,7 +125,8 @@ namespace MauiApp3
                 }
             };
 
-            BindingContext = this;
+            // Set BindingContext after initializing data
+            BindingContext = new UserGroupsViewModel(this);
 
             if (Sections.Count > 0)
             {
