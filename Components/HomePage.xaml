@@ -37,6 +37,21 @@
                     Grid.Column="2" />
         </Grid>
 
+         <CollectionView ItemsSource="{Binding UserGroups}" Margin="20">
+        <CollectionView.ItemTemplate>
+            <DataTemplate>
+                <Grid Padding="10" ColumnDefinitions="*,*,*,*,*">
+                    <Label Grid.Column="0" Text="{Binding netID}" />
+                    <Label Grid.Column="1" Text="{Binding role}" />
+                    <Label Grid.Column="2" Text="{Binding group}" />
+                    <Label Grid.Column="3" Text="{Binding firstName}" />
+                    <Label Grid.Column="4" Text="{Binding lastName}" />
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+
+
         <!-- Section Picker -->
         <Picker Title="Select Class Section" 
                 ItemsSource="{Binding Sections}" 

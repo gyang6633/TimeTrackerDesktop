@@ -61,15 +61,16 @@ namespace MauiApp3.Components
         {
             var responseString = await _httpClient.GetStringAsync(url);
             // Log or display the raw response
-            await Application.Current.MainPage.DisplayAlert("Response", responseString, "OK");
+            //await Application.Current.MainPage.DisplayAlert("Response", responseString, "OK");
 
             // Now attempt to deserialize the response
-            var response = JsonSerializer.Deserialize<List<UserGroup>>(responseString);
+            var jsonDocument = JsonDocument.Parse(responseString);
+            var response = jsonDocument.RootElement.GetProperty("0").Deserialize<List<UserGroup>>();
 
             if (response != null)
             {
                 UserGroups = response;
-                string displayMessage = string.Join("\n", response.Select(group => $"ID: {group.Id}, Name: {group.Name}"));
+                string displayMessage = string.Join("\n", response.Select(group => $"ID: {group.id}, NetID: {group.netID}, Role: {group.role}, Group: {group.group}, First Name: {group.firstName}, Last Name: {group.lastName}"));
                 await Application.Current.MainPage.DisplayAlert("Response", displayMessage, "OK");
             }
             else
@@ -86,9 +87,13 @@ namespace MauiApp3.Components
     // Define a UserGroup model to match the JSON data structure
     public class UserGroup
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int id { get; set; }
+        public string netID { get; set; }
         // Add other properties as per your JSON data structure
+        public string role { get; set; }
+        public int group { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
     }
 }
 }
