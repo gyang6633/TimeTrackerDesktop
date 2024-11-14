@@ -3,72 +3,69 @@
              x:Class="MauiApp3.HomePage"
              x:Name="HomePageInstance">
 
-    <StackLayout Padding="25" Spacing="25">
-        <!-- Week Range Display Label -->
-        <Label Text="{Binding WeekRangeDisplay, StringFormat='Week of {0}'}" 
-               HorizontalOptions="Center" 
-               FontAttributes="Bold"
-               FontSize="Medium" />
+    <!-- Wrap the StackLayout in a ScrollView to enable scrolling -->
+    <ScrollView>
+        <StackLayout Padding="25" Spacing="25">
+            <!-- Week Range Display Label -->
+            <Label Text="{Binding WeekRangeDisplay, StringFormat='Week of {0}'}" 
+                   HorizontalOptions="Center" 
+                   FontAttributes="Bold"
+                   FontSize="Medium" />
 
-        <!-- Calendar/Week Picker Section -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <!-- Calendar/Week Picker Section -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Previous Week Button -->
-            <Button x:Name="PreviousWeekButton"
-                    Text="Previous Week" 
-                    Command="{Binding PreviousWeekCommand}" 
-                    Grid.Column="0" />
+                <!-- Previous Week Button -->
+                <Button x:Name="PreviousWeekButton"
+                        Text="Previous Week" 
+                        Command="{Binding PreviousWeekCommand}" 
+                        Grid.Column="0" />
 
-            <!-- Date Picker for Selecting the Week's Start Date -->
-            <DatePicker x:Name="WeekStartDatePicker"
-                        Date="{Binding SelectedWeekStartDate, Mode=TwoWay}"
-                        Grid.Column="1"
-                        HorizontalOptions="Center" />
+                <!-- Date Picker for Selecting the Week's Start Date -->
+                <DatePicker x:Name="WeekStartDatePicker"
+                            Date="{Binding SelectedWeekStartDate, Mode=TwoWay}"
+                            Grid.Column="1"
+                            HorizontalOptions="Center" />
 
-            <!-- Next Week Button -->
-            <Button x:Name="NextWeekButton"
-                    Text="Next Week" 
-                    Command="{Binding NextWeekCommand}" 
-                    Grid.Column="2" />
-        </Grid>
+                <!-- Next Week Button -->
+                <Button x:Name="NextWeekButton"
+                        Text="Next Week" 
+                        Command="{Binding NextWeekCommand}" 
+                        Grid.Column="2" />
+            </Grid>
 
-         <CollectionView ItemsSource="{Binding UserGroups}" Margin="20">
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
-                <Grid Padding="10" ColumnDefinitions="*,*,*,*,*">
-                    <Label Grid.Column="0" Text="{Binding netID}" />
-                    <Label Grid.Column="1" Text="{Binding role}" />
-                    <Label Grid.Column="2" Text="{Binding group}" />
-                    <Label Grid.Column="3" Text="{Binding firstName}" />
-                    <Label Grid.Column="4" Text="{Binding lastName}" />
-                </Grid>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+            <!-- CollectionView with Header for UserGroups -->
+            <CollectionView ItemsSource="{Binding UserGroups}" Margin="0" VerticalOptions="Start">
+                <!-- Define the header layout inside the CollectionView -->
+                <CollectionView.Header>
+                    <Grid Padding="10" ColumnDefinitions="*,*,*,*,*" BackgroundColor="#6200EA">
+                        <Label Grid.Column="0" Text="NetID" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+                        <Label Grid.Column="1" Text="Group" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+                        <Label Grid.Column="2" Text="First Name" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+                        <Label Grid.Column="3" Text="Last Name" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+                        <Label Grid.Column="4" Text="Weekly Hours" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White"/>
+                    </Grid>
+                </CollectionView.Header>
 
+                <!-- Define the item template for data rows -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10" ColumnDefinitions="*,*,*,*,*">
+                            <Label Grid.Column="0" Text="{Binding netID}" HorizontalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding group}" HorizontalOptions="Center" />
+                            <Label Grid.Column="2" Text="{Binding firstName}" HorizontalOptions="Center" />
+                            <Label Grid.Column="3" Text="{Binding lastName}" HorizontalOptions="Center" />
+                            <Label Grid.Column="4" Text="{Binding WeeklyCumulativeHours}" HorizontalOptions="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-        <!-- Section Picker -->
-        <Picker Title="Select Class Section" 
-                ItemsSource="{Binding Sections}" 
-                ItemDisplayBinding="{Binding SectionName}" 
-                SelectedItem="{Binding SelectedSection}" />
-
-        <!-- Debug label to verify selected section
-        <Label Text="{Binding SelectedSection.SectionName}"
-           HorizontalOptions="Center"
-           FontAttributes="Italic"
-           FontSize="Small"
-           TextColor="Gray" /> -->
-        
-
-        <!-- Student Hours Grid -->
-        <Grid x:Name="StudentHoursGrid" Padding="10">
-            <!-- The student hours grid will be populated dynamically from code-behind -->
-        </Grid>
-    </StackLayout>
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

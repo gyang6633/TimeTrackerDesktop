@@ -53,47 +53,85 @@ namespace MauiApp3.Components
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-    private async Task FetchUserGroupsAsync()
-    {
-        var url = "http://localhost:5264/api/user/groups";
-
-        try
+        private async Task FetchUserGroupsAsync()
         {
-            var responseString = await _httpClient.GetStringAsync(url);
-            // Log or display the raw response
-            //await Application.Current.MainPage.DisplayAlert("Response", responseString, "OK");
+            var url = "http://localhost:5264/api/user/groups";
 
-            // Now attempt to deserialize the response
-            var jsonDocument = JsonDocument.Parse(responseString);
-            var response = jsonDocument.RootElement.GetProperty("0").Deserialize<List<UserGroup>>();
-
-            if (response != null)
+            try
             {
-                UserGroups = response;
-                string displayMessage = string.Join("\n", response.Select(group => $"ID: {group.id}, NetID: {group.netID}, Role: {group.role}, Group: {group.group}, First Name: {group.firstName}, Last Name: {group.lastName}"));
-                await Application.Current.MainPage.DisplayAlert("Response", displayMessage, "OK");
+                var responseString = await _httpClient.GetStringAsync(url);
+                var jsonDocument = JsonDocument.Parse(responseString);
+
+                var allUserGroups = new List<UserGroup>();
+
+                // Iterate through each group property in the JSON
+                foreach (var groupProperty in jsonDocument.RootElement.EnumerateObject())
+                {
+                    var userGroupList = JsonSerializer.Deserialize<List<UserGroup>>(groupProperty.Value.GetRawText());
+                    if (userGroupList != null)
+                    {
+                        allUserGroups.AddRange(userGroupList);
+                    }
+                }
+
+                // Set the UserGroups property to the aggregated list of all groups
+                UserGroups = allUserGroups;
+
+                // Calculate weekly cumulative hours for each user
+                foreach (var userGroup in UserGroups)
+                {
+                    int totalWeeklyHours = 0;
+                    foreach (var timeLog in userGroup.timeLogs)
+                    {
+                        foreach (var entry in timeLog.timeLogEntries)
+                        {
+                            totalWeeklyHours += entry.duration; // Assuming duration is in hours
+                        }
+                    }
+                    userGroup.WeeklyCumulativeHours = totalWeeklyHours;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "No data found.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
-        }
-    }
 
-    // Define a UserGroup model to match the JSON data structure
-    public class UserGroup
-    {
-        public int id { get; set; }
-        public string netID { get; set; }
-        // Add other properties as per your JSON data structure
-        public string role { get; set; }
-        public int group { get; set; }
-        public string firstName { get; set; }
-        public string lastName { get; set; }
+
+
+
+        public class UserGroup
+        {
+            public int id { get; set; }
+            public string netID { get; set; }
+            public string role { get; set; }
+            public int group { get; set; }
+            public string firstName { get; set; }
+            public string lastName { get; set; }
+            public List<TimeLog> timeLogs { get; set; }
+
+            // Weekly cumulative hours property for binding
+            public int WeeklyCumulativeHours { get; set; }
+        }
+
+
+        public class TimeLog
+        {
+            public int id { get; set; }
+            public int userId { get; set; }
+            public string title { get; set; }
+            public List<TimeLogEntry> timeLogEntries { get; set; }
+        }
+
+        public class TimeLogEntry
+        {
+            public int id { get; set; }
+            public int timeLogId { get; set; }
+            public DateTime startTime { get; set; }
+            public DateTime endTime { get; set; }
+            public int duration { get; set; }
+            public string description { get; set; }
+        }
+
     }
-}
 }
