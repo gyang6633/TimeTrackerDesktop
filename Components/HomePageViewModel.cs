@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -18,14 +17,12 @@ namespace MauiApp3.Components
 
         public UserGroupsViewModel()
         {
-            // Initialize HttpClient or use dependency injection
             _httpClient = new HttpClient();
-            // Automatically trigger the data fetch when the ViewModel is instantiated
-            FetchUserGroupsAsync().ConfigureAwait(false);
             FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync());
+            ToggleExpandCommand = new Command<UserGroup>(ToggleExpand);
+            FetchUserGroupsAsync().ConfigureAwait(false);
         }
 
-        // Constructor that accepts a Page reference
         public UserGroupsViewModel(Page page) : this()
         {
             _page = page;
@@ -40,11 +37,16 @@ namespace MauiApp3.Components
                 {
                     _userGroups = value;
                     OnPropertyChanged(nameof(UserGroups));
+                    OnPropertyChanged(nameof(StudentGroups));
                 }
             }
         }
 
+        public List<UserGroup> StudentGroups =>
+            _userGroups?.FindAll(group => string.Equals(group.role, "student", StringComparison.OrdinalIgnoreCase)) ?? new List<UserGroup>();
+
         public ICommand FetchUserGroupsCommand { get; }
+        public ICommand ToggleExpandCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -64,7 +66,6 @@ namespace MauiApp3.Components
 
                 var allUserGroups = new List<UserGroup>();
 
-                // Iterate through each group property in the JSON
                 foreach (var groupProperty in jsonDocument.RootElement.EnumerateObject())
                 {
                     var userGroupList = JsonSerializer.Deserialize<List<UserGroup>>(groupProperty.Value.GetRawText());
@@ -74,21 +75,21 @@ namespace MauiApp3.Components
                     }
                 }
 
-                // Set the UserGroups property to the aggregated list of all groups
                 UserGroups = allUserGroups;
 
-                // Calculate weekly cumulative hours for each user
                 foreach (var userGroup in UserGroups)
                 {
-                    int totalWeeklyHours = 0;
+                    int totalWeeklyMinutes = 0;
                     foreach (var timeLog in userGroup.timeLogs)
                     {
                         foreach (var entry in timeLog.timeLogEntries)
                         {
-                            totalWeeklyHours += entry.duration; // Assuming duration is in hours
+                            totalWeeklyMinutes += entry.duration;
                         }
                     }
-                    userGroup.WeeklyCumulativeHours = totalWeeklyHours;
+
+                    userGroup.WeeklyCumulativeHours = totalWeeklyMinutes;
+                    userGroup.WeeklyCumulativeHoursFormatted = $"{totalWeeklyMinutes / 60:D2}:{totalWeeklyMinutes % 60:D2}";
                 }
             }
             catch (Exception ex)
@@ -97,10 +98,15 @@ namespace MauiApp3.Components
             }
         }
 
+        private void ToggleExpand(UserGroup userGroup)
+        {
+            if (userGroup != null)
+            {
+                userGroup.IsExpanded = !userGroup.IsExpanded;
+            }
+        }
 
-
-
-        public class UserGroup
+        public class UserGroup : INotifyPropertyChanged
         {
             public int id { get; set; }
             public string netID { get; set; }
@@ -109,11 +115,30 @@ namespace MauiApp3.Components
             public string firstName { get; set; }
             public string lastName { get; set; }
             public List<TimeLog> timeLogs { get; set; }
-
-            // Weekly cumulative hours property for binding
             public int WeeklyCumulativeHours { get; set; }
-        }
+            public string WeeklyCumulativeHoursFormatted { get; set; }
 
+            private bool _isExpanded;
+            public bool IsExpanded
+            {
+                get => _isExpanded;
+                set
+                {
+                    if (_isExpanded != value)
+                    {
+                        _isExpanded = value;
+                        OnPropertyChanged(nameof(IsExpanded));
+                    }
+                }
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            protected virtual void OnPropertyChanged(string propertyName)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public class TimeLog
         {
@@ -132,6 +157,5 @@ namespace MauiApp3.Components
             public int duration { get; set; }
             public string description { get; set; }
         }
-
     }
 }

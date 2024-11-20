@@ -72,7 +72,7 @@ namespace MauiApp3.Components
                     }
                     else
                     {
-                        await _page.DisplayAlert("Login", "Login successful", "OK");
+                        // await _page.DisplayAlert("Login", "Login successful", "OK");
                         await _page.Navigation.PushAsync(new HomePage());
                     }
                 }
