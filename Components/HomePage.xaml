@@ -6,17 +6,20 @@
 
     <ScrollView>
         <StackLayout Padding="25" Spacing="25">
-            <Label Text="{Binding WeekRangeDisplay, StringFormat='Week of {0}'}"
+            <!-- Week Range Display -->
+            <Label Text="{Binding WeekRangeDisplay, Mode=OneWay}"
                    HorizontalOptions="Center"
                    FontAttributes="Bold"
                    FontSize="Medium" />
 
+            <!-- Navigation Buttons -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+
                 <Button Text="Previous Week" 
                         Command="{Binding PreviousWeekCommand}" 
                         Grid.Column="0" />
@@ -31,13 +34,13 @@
             <CollectionView ItemsSource="{Binding StudentGroups}" Margin="0" VerticalOptions="Start">
                 <!-- Header -->
                 <CollectionView.Header>
-                    <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,Auto" BackgroundColor="#6200EA">
+                    <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,*" BackgroundColor="#6200EA">
                         <Label Grid.Column="0" Text="NetID" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
                         <Label Grid.Column="1" Text="Group" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
                         <Label Grid.Column="2" Text="First Name" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
                         <Label Grid.Column="3" Text="Last Name" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
                         <Label Grid.Column="4" Text="Weekly Time (HH:MM)" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
-                        <Label Grid.Column="5" Text="" />
+                        <Label Grid.Column="5" Text="Cumulative Hours (HH:MM)" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
                     </Grid>
                 </CollectionView.Header>
 
@@ -46,7 +49,7 @@
                     <DataTemplate>
                         <StackLayout>
                             <!-- Main Row -->
-                            <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,Auto">
+                            <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,*,Auto">
                                 <Label Grid.Column="0" Text="{Binding netID}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                 <Label Grid.Column="1" Text="{Binding group}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                 <Label Grid.Column="2" Text="{Binding firstName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
@@ -55,26 +58,35 @@
                                 <!-- Weekly Time -->
                                 <Label Grid.Column="4" Text="{Binding WeeklyCumulativeHoursFormatted}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center">
                                     <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:UserGroupsViewModel}}, Path=ToggleExpandCommand}"
-                                                              CommandParameter="{Binding}" />
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:UserGroupsViewModel}}, Path=ToggleWeeklyExpandCommand}"
+                                            CommandParameter="{Binding}" />
                                     </Label.GestureRecognizers>
                                 </Label>
 
+                                <!-- Cumulative Hours -->
+                                <Label Grid.Column="5" Text="{Binding TotalCumulativeHoursFormatted}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:UserGroupsViewModel}}, Path=ToggleCumulativeExpandCommand}"
+                                            CommandParameter="{Binding}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+
+
                                 <!-- Expand/Collapse Icon -->
-                                <Image Grid.Column="5" WidthRequest="24" HeightRequest="24"
-                                       Source="{Binding IsExpanded, Converter={StaticResource BooleanToImageConverter}}"
-                                       HorizontalOptions="Center" VerticalOptions="Center">
+                                <Image Grid.Column="6" WidthRequest="24" HeightRequest="24"
+                                        Source="{Binding IsExpanded, Converter={StaticResource BooleanToImageConverter}}"
+                                        HorizontalOptions="Center" VerticalOptions="Center">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:UserGroupsViewModel}}, Path=ToggleExpandCommand}"
-                                                              CommandParameter="{Binding}" />
+                                                CommandParameter="{Binding}" />
                                     </Image.GestureRecognizers>
                                 </Image>
                             </Grid>
 
-                            <!-- Expanded Details Section -->
-                            <StackLayout IsVisible="{Binding IsExpanded}" Padding="10" BackgroundColor="#f9f9f9">
-                                <Label Text="Time Logs" FontAttributes="Bold" />
-                                <CollectionView ItemsSource="{Binding timeLogs}" Margin="0">
+
+                            <!-- Weekly Hours Expanded Section -->
+                            <StackLayout IsVisible="{Binding IsExpandedForWeeklyHours}" Padding="10" BackgroundColor="#f9f9f9">
+                                <CollectionView ItemsSource="{Binding FilteredTimeLogs}">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
                                             <StackLayout>
@@ -82,9 +94,46 @@
                                                 <CollectionView ItemsSource="{Binding timeLogEntries}">
                                                     <CollectionView.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Grid Padding="5" ColumnDefinitions="*,*">
-                                                                <Label Grid.Column="0" Text="{Binding duration, StringFormat='Duration: {0} mins'}" />
-                                                                <Label Grid.Column="1" Text="{Binding description}" />
+                                                            <Grid Padding="5" ColumnDefinitions=".25*,.5*,3*">
+                                                                <!-- Week -->
+                                                                <Label Grid.Column="0" Text="{Binding FormattedCreatedAt}" 
+                                                                    HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+
+                                                                <!-- Duration -->
+                                                                <Label Grid.Column="1" Text="{Binding DurationFormatted}" 
+                                                                    HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+
+                                                                <!-- Description -->
+                                                                <Label Grid.Column="2" Text="{Binding description}" 
+                                                                    HorizontalTextAlignment="Start" VerticalTextAlignment="Center" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </CollectionView.ItemTemplate>
+                                                </CollectionView>
+                                            </StackLayout>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+
+                            <!-- Cumulative Hours Expanded Section -->
+                            <StackLayout IsVisible="{Binding IsExpandedForCumulativeHours}" Padding="10" BackgroundColor="#f0f0f0">
+                                <Label Text="Cumulative Time Logs" FontAttributes="Bold" />
+                                <CollectionView ItemsSource="{Binding timeLogs}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackLayout>
+                                                <Label Text="{Binding title}" FontAttributes="Bold" />
+                                                <CollectionView ItemsSource="{Binding timeLogEntries}">
+                                                    <CollectionView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Padding="5" ColumnDefinitions="*,*,*">
+                                                                <Label Grid.Column="0" Text="{Binding FormattedCreatedAt}" 
+                                                                    HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                <Label Grid.Column="1" Text="{Binding duration, StringFormat='Duration: {0} mins'}" 
+                                                                    HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                <Label Grid.Column="2" Text="{Binding description}" 
+                                                                    HorizontalTextAlignment="Start" VerticalTextAlignment="Center" />
                                                             </Grid>
                                                         </DataTemplate>
                                                     </CollectionView.ItemTemplate>

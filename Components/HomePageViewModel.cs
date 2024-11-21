@@ -15,17 +15,20 @@ namespace MauiApp3.Components
         private readonly HttpClient _httpClient;
         private readonly Page _page;
 
-        public UserGroupsViewModel()
-        {
-            _httpClient = new HttpClient();
-            FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync());
-            ToggleExpandCommand = new Command<UserGroup>(ToggleExpand);
-            FetchUserGroupsAsync().ConfigureAwait(false);
-        }
+        private DateTime _selectedWeekStartDate;
 
-        public UserGroupsViewModel(Page page) : this()
+        public DateTime SelectedWeekStartDate
         {
-            _page = page;
+            get => _selectedWeekStartDate;
+            set
+            {
+                if (_selectedWeekStartDate != value)
+                {
+                    _selectedWeekStartDate = value;
+                    OnPropertyChanged(nameof(SelectedWeekStartDate));
+                    UpdateFilteredTimeLogs();
+                }
+            }
         }
 
         public List<UserGroup> UserGroups
@@ -46,7 +49,68 @@ namespace MauiApp3.Components
             _userGroups?.FindAll(group => string.Equals(group.role, "student", StringComparison.OrdinalIgnoreCase)) ?? new List<UserGroup>();
 
         public ICommand FetchUserGroupsCommand { get; }
-        public ICommand ToggleExpandCommand { get; }
+        public ICommand ToggleWeeklyExpandCommand { get; }
+        public ICommand ToggleCumulativeExpandCommand { get; }
+
+        public UserGroupsViewModel(Page page)
+        {
+            _page = page;
+            _httpClient = new HttpClient();
+            FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync());
+            ToggleWeeklyExpandCommand = new Command<UserGroup>(ToggleWeeklyExpand);
+            ToggleCumulativeExpandCommand = new Command<UserGroup>(ToggleCumulativeExpand);
+            SelectedWeekStartDate = DateTime.Now; // Initialize with the current week
+            FetchUserGroupsAsync().ConfigureAwait(false);
+        }
+
+        private void ToggleWeeklyExpand(UserGroup userGroup)
+        {
+            if (userGroup != null)
+            {
+                userGroup.IsExpandedForWeeklyHours = !userGroup.IsExpandedForWeeklyHours;
+
+                // Collapse the other expansion
+                if (userGroup.IsExpandedForWeeklyHours)
+                {
+                    userGroup.IsExpandedForCumulativeHours = false;
+                }
+
+                OnPropertyChanged(nameof(UserGroups));
+            }
+        }
+
+        private void ToggleCumulativeExpand(UserGroup userGroup)
+        {
+            if (userGroup != null)
+            {
+                userGroup.IsExpandedForCumulativeHours = !userGroup.IsExpandedForCumulativeHours;
+
+                // Collapse the other expansion
+                if (userGroup.IsExpandedForCumulativeHours)
+                {
+                    userGroup.IsExpandedForWeeklyHours = false;
+                }
+
+                OnPropertyChanged(nameof(UserGroups));
+            }
+        }
+
+        private void UpdateFilteredTimeLogs()
+        {
+            if (UserGroups == null || !UserGroups.Any())
+                return;
+
+            var startOfWeek = SelectedWeekStartDate;
+            var endOfWeek = startOfWeek.AddDays(6);
+
+            foreach (var userGroup in UserGroups)
+            {
+                userGroup.UpdateFilteredTimeLogs(startOfWeek, endOfWeek);
+            }
+
+            OnPropertyChanged(nameof(UserGroups));
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -79,68 +143,132 @@ namespace MauiApp3.Components
 
                 foreach (var userGroup in UserGroups)
                 {
-                    int totalWeeklyMinutes = 0;
+                    int totalCumulativeMinutes = 0;
                     foreach (var timeLog in userGroup.timeLogs)
                     {
+                        int totalWeeklyMinutes = 0;
                         foreach (var entry in timeLog.timeLogEntries)
                         {
                             totalWeeklyMinutes += entry.duration;
+                            totalCumulativeMinutes += entry.duration;
                         }
+                        userGroup.WeeklyCumulativeHours = totalWeeklyMinutes;
+                        userGroup.WeeklyCumulativeHoursFormatted = $"{totalWeeklyMinutes / 60:D2}:{totalWeeklyMinutes % 60:D2}";
                     }
-
-                    userGroup.WeeklyCumulativeHours = totalWeeklyMinutes;
-                    userGroup.WeeklyCumulativeHoursFormatted = $"{totalWeeklyMinutes / 60:D2}:{totalWeeklyMinutes % 60:D2}";
+                    userGroup.TotalCumulativeHours = totalCumulativeMinutes;
+                    userGroup.TotalCumulativeHoursFormatted = $"{totalCumulativeMinutes / 60:D2}:{totalCumulativeMinutes % 60:D2}";
                 }
+
+                UpdateFilteredTimeLogs();
             }
             catch (Exception ex)
             {
                 await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
+    }
 
-        private void ToggleExpand(UserGroup userGroup)
+
+
+    public class UserGroup : INotifyPropertyChanged
+    {
+        public int id { get; set; }
+        public string netID { get; set; }
+        public string role { get; set; }
+        public int group { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public List<TimeLog> timeLogs { get; set; }
+        public int WeeklyCumulativeHours { get; set; }
+        public string WeeklyCumulativeHoursFormatted { get; set; }
+        public int TotalCumulativeHours { get; set; }
+        public string TotalCumulativeHoursFormatted { get; set; }
+
+        private List<TimeLog> _filteredTimeLogs;
+        public List<TimeLog> FilteredTimeLogs
         {
-            if (userGroup != null)
+            get => _filteredTimeLogs;
+            set
             {
-                userGroup.IsExpanded = !userGroup.IsExpanded;
-            }
-        }
-
-        public class UserGroup : INotifyPropertyChanged
-        {
-            public int id { get; set; }
-            public string netID { get; set; }
-            public string role { get; set; }
-            public int group { get; set; }
-            public string firstName { get; set; }
-            public string lastName { get; set; }
-            public List<TimeLog> timeLogs { get; set; }
-            public int WeeklyCumulativeHours { get; set; }
-            public string WeeklyCumulativeHoursFormatted { get; set; }
-
-            private bool _isExpanded;
-            public bool IsExpanded
-            {
-                get => _isExpanded;
-                set
+                if (_filteredTimeLogs != value)
                 {
-                    if (_isExpanded != value)
-                    {
-                        _isExpanded = value;
-                        OnPropertyChanged(nameof(IsExpanded));
-                    }
+                    _filteredTimeLogs = value;
+                    OnPropertyChanged(nameof(FilteredTimeLogs));
                 }
             }
+        }
 
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            protected virtual void OnPropertyChanged(string propertyName)
+        public void UpdateFilteredTimeLogs(DateTime selectedWeekStartDate, DateTime selectedWeekEndDate)
+        {
+            if (timeLogs != null)
             {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                FilteredTimeLogs = timeLogs
+                    .Where(log => log.timeLogEntries.Any(entry =>
+                        DateTime.Parse(entry.createdAt).Date >= selectedWeekStartDate.Date &&
+                        DateTime.Parse(entry.createdAt).Date <= selectedWeekEndDate.Date))
+                    .Select(log => new TimeLog
+                    {
+                        id = log.id,
+                        userId = log.userId,
+                        title = log.title,
+                        timeLogEntries = log.timeLogEntries
+                            .Where(entry => DateTime.Parse(entry.createdAt).Date >= selectedWeekStartDate.Date &&
+                                            DateTime.Parse(entry.createdAt) <= selectedWeekEndDate.Date)
+                            .ToList()
+                    })
+                    .ToList();
+            }
+            else
+            {
+                FilteredTimeLogs = new List<TimeLog>();
+            }
+
+            OnPropertyChanged(nameof(FilteredTimeLogs));
+        }
+
+
+
+
+
+        private bool _isExpandedForWeeklyHours;
+        public bool IsExpandedForWeeklyHours
+        {
+            get => _isExpandedForWeeklyHours;
+            set
+            {
+                if (_isExpandedForWeeklyHours != value)
+                {
+                    _isExpandedForWeeklyHours = value;
+                    OnPropertyChanged(nameof(IsExpandedForWeeklyHours));
+                }
             }
         }
 
-        public class TimeLog
+        private bool _isExpandedForCumulativeHours;
+        public bool IsExpandedForCumulativeHours
+        {
+            get => _isExpandedForCumulativeHours;
+            set
+            {
+                if (_isExpandedForCumulativeHours != value)
+                {
+                    _isExpandedForCumulativeHours = value;
+                    OnPropertyChanged(nameof(IsExpandedForCumulativeHours));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+
+
+    public class TimeLog
         {
             public int id { get; set; }
             public int userId { get; set; }
@@ -152,10 +280,21 @@ namespace MauiApp3.Components
         {
             public int id { get; set; }
             public int timeLogId { get; set; }
-            public DateTime startTime { get; set; }
-            public DateTime endTime { get; set; }
             public int duration { get; set; }
-            public string description { get; set; }
+            public string DurationFormatted => $"{duration / 60:D2}:{duration % 60:D2}";
+        public string description { get; set; }
+            public string createdAt { get; set; }
+
+            public string FormattedCreatedAt
+            {
+                get
+                {
+                    if (DateTime.TryParse(createdAt, out var date))
+                    {
+                        return date.ToString("MM/dd");
+                    }
+                    return string.Empty; // Return empty if parsing fails
+                }
+            }
         }
     }
-}

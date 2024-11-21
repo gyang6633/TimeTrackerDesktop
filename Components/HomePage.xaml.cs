@@ -8,13 +8,45 @@ namespace MauiApp3
 {
     public partial class HomePage : ContentPage, INotifyPropertyChanged
     {
+        private readonly UserGroupsViewModel _viewModel;
         private DateTime _selectedWeekStartDate;
+        private string _weekRangeDisplay;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public HomePage()
+        {
+            InitializeComponent();
+
+            // Initialize ViewModel and bind it to the page
+            _viewModel = new UserGroupsViewModel(this);
+            BindingContext = _viewModel;
+
+            // Initialize the selected week
+            SelectedWeekStartDate = GetStartOfWeek(DateTime.Now);
+            _viewModel.SelectedWeekStartDate = SelectedWeekStartDate;
+
+            // Commands for navigation
+            PreviousWeekCommand = new Command(() =>
+            {
+                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7);
+                _viewModel.SelectedWeekStartDate = SelectedWeekStartDate; // Sync ViewModel
+                UpdateWeekRangeDisplay();
+            });
+
+            NextWeekCommand = new Command(() =>
+            {
+                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7);
+                _viewModel.SelectedWeekStartDate = SelectedWeekStartDate; // Sync ViewModel
+                UpdateWeekRangeDisplay();
+            });
+
+            UpdateWeekRangeDisplay();
         }
 
         // Property for the currently selected week's start date
@@ -27,43 +59,34 @@ namespace MauiApp3
                 {
                     _selectedWeekStartDate = value;
                     OnPropertyChanged(nameof(SelectedWeekStartDate));
-                    UpdateWeekRangeDisplay();
+                    WeekRangeDisplay = $"{GetStartOfWeek(_selectedWeekStartDate):MM/dd/yyyy} - {GetEndOfWeek(_selectedWeekStartDate):MM/dd/yyyy}";
                 }
             }
         }
 
-        // Property for displaying the week range as text
-        public string WeekRangeDisplay { get; private set; }
+        // Display the week range
+        public string WeekRangeDisplay
+        {
+            get => _weekRangeDisplay;
+            private set
+            {
+                if (_weekRangeDisplay != value)
+                {
+                    _weekRangeDisplay = value;
+                    OnPropertyChanged(nameof(WeekRangeDisplay));
+                }
+            }
+        }
 
+        // Update the display for the week range
         private void UpdateWeekRangeDisplay()
         {
-            WeekRangeDisplay = $"{GetStartOfWeek(SelectedWeekStartDate):MM/dd/yyyy} - {GetEndOfWeek(SelectedWeekStartDate):MM/dd/yyyy}";
             OnPropertyChanged(nameof(WeekRangeDisplay));
         }
 
-        // Commands for navigating between weeks
+        // Commands for navigation
         public ICommand PreviousWeekCommand { get; }
         public ICommand NextWeekCommand { get; }
-
-        public HomePage()
-        {
-            InitializeComponent();
-            BindingContext = new UserGroupsViewModel(this);
-
-            SelectedWeekStartDate = GetStartOfWeek(DateTime.Now);
-
-            PreviousWeekCommand = new Command(() =>
-            {
-                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7);
-            });
-
-            NextWeekCommand = new Command(() =>
-            {
-                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7);
-            });
-
-            UpdateWeekRangeDisplay();
-        }
 
         private DateTime GetStartOfWeek(DateTime date)
         {
