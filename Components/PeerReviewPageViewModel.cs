@@ -70,14 +70,21 @@ namespace MauiApp3.Components
             }
         }
 
+         public ICommand NavigateToCreatePRQCommand { get; }
+
         public PeerReviewPageViewModel(Page page)
         {
             _page = page;
             _httpClient = new HttpClient();
+            NavigateToCreatePRQCommand = new Command(async () =>
+            {
+                // Navigate to PeerReviewPage
+                await _page.Navigation.PushAsync(new CreatePRQPage());
+            });
             FetchPeerReviewsCommand = new Command(async () => await LoadPeerReviewsAsync());
-            LoadPeerReviewsAsync().ConfigureAwait(false);
             ToggleReviewsGivenExpandCommand = new Command <UserGroup>(ToggleReviewsGivenExpand);
             ToggleReviewsReceivedExpandCommand = new Command <UserGroup>(ToggleReviewsReceivedExpand);
+            LoadPeerReviewsAsync().ConfigureAwait(false);
         }
 
 
@@ -102,21 +109,26 @@ namespace MauiApp3.Components
                 }
 
                 UserGroups = allUserGroups;
-
+                await Application.Current.MainPage.DisplayAlert("Output", responseString, "OK");
+                //for each user in returned list of users
                 foreach (var userGroup in UserGroups)
                 {
-                    int reviewsGiven = 0;
-                    int reviewsReceived = 0;
+                    //count number of reviews
+                    int numReviewsGiven = 0;
+                    int numReviewsReceived = 0;
+                    //loop through all reviews 
                     foreach (var review in userGroup.ReviewsGiven)
                     {
-                        reviewsGiven += 1;
+                        //increment per review
+                        numReviewsGiven += 1;
                     }
                     foreach (var review in userGroup.ReviewsReceived)
                     {
-                        reviewsReceived += 1;
+                        numReviewsReceived += 1;
                     }
-                    userGroup.NumberReviewsGiven = reviewsGiven;
-                    userGroup.NumberReviewsReceived = reviewsReceived;
+                    //set property in user class
+                    userGroup.NumberReviewsGiven = numReviewsGiven;
+                    userGroup.NumberReviewsReceived = numReviewsReceived;
                 }
 
             }
@@ -172,5 +184,24 @@ namespace MauiApp3.Components
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+    public class PeerReviewAnswer
+    {
+        public int PeerReviewAnswerId { get; set; } // The answer ID
 
+        // Foreign key to PeerReview and PeerReviewQuestion
+        public int PeerReviewId { get; set; } // The review ID for this answer
+        public required PeerReview PeerReview { get; set; } // Navigation property to the PeerReview
+
+        public int PeerReviewQuestionId { get; set; } // The question ID for this answer
+        public required PeerReviewQuestion PeerReviewQuestion { get; set; } // Navigation property to the PeerReviewQuestion
+
+        // Answer details
+        public int NumericalFeedback { get; set; }  // Numerical score for this specific question
+        public required string WrittenFeedback { get; set; } // Written feedback for this specific question
+    }
+        public class PeerReviewQuestion
+    {
+        public int PeerReviewQuestionId { get; set; } // The question ID
+        public required string QuestionText { get; set; }  // The question text
+    }
 }

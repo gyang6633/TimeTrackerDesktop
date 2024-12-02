@@ -270,36 +270,10 @@ namespace MauiApp3.Components
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private List<PeerReview> _reviewsReceived;
-
-        public List<PeerReview> ReviewsReceived {
-            get => _reviewsReceived;
-            set
-            {
-                if (_reviewsReceived != value)
-                {
-                    _reviewsReceived = value;
-                    OnPropertyChanged(nameof(ReviewsReceived));
-                }
-            } 
-        }
-        private List<PeerReview> _reviewsGiven;
-
-        public List<PeerReview> ReviewsGiven {
-            get => _reviewsGiven;
-            set
-            {
-                if (_reviewsGiven != value)
-                {
-                    _reviewsGiven = value;
-                    OnPropertyChanged(nameof(ReviewsGiven));
-                }
-            } 
-        }
+        public List<PeerReview> ReviewsGiven{get; set;}
+        public List<PeerReview> ReviewsReceived{get; set;}
         public int NumberReviewsReceived{ get; set; }
         public int NumberReviewsGiven { get; set; }
-
         private bool _isReviewsGivenExpanded;
         public bool IsReviewsGivenExpanded
         {
@@ -327,6 +301,34 @@ namespace MauiApp3.Components
                 }
             }
         }
+        /*
+        private List<PeerReview> _reviewsReceived;
+        
+        public List<PeerReview> ReviewsReceived {
+            get => _reviewsReceived;
+            set
+            {
+                if (_reviewsReceived != value)
+                {
+                    _reviewsReceived = value;
+                    OnPropertyChanged(nameof(ReviewsReceived));
+                }
+            } 
+        }
+        private List<PeerReview> _reviewsGiven;
+
+        public List<PeerReview> ReviewsGiven {
+            get => _reviewsGiven;
+            set
+            {
+                if (_reviewsGiven != value)
+                {
+                    _reviewsGiven = value;
+                    OnPropertyChanged(nameof(ReviewsGiven));
+                }
+            } 
+        }
+        */
     }
 
 
@@ -345,7 +347,7 @@ namespace MauiApp3.Components
             public int timeLogId { get; set; }
             public int duration { get; set; }
             public string DurationFormatted => $"{duration / 60:D2}:{duration % 60:D2}";
-        public string description { get; set; }
+            public string description { get; set; }
             public string createdAt { get; set; }
 
             public string FormattedCreatedAt
