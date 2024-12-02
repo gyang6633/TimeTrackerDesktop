@@ -6,34 +6,24 @@
 
     <ScrollView>
         <StackLayout Padding="25" Spacing="25">
-            <!-- Week Range Display -->
-            <Button Text="Peer Reviews"
-                Command="{Binding NavigateToPeerReviewCommand}"
+            <Label Text="Time Logs"
+                FontSize="Title"
+                FontFamily="Arial"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"/>
+            <Grid>
+                <!-- DatePicker -->
+                <DatePicker Date="{Binding SelectedWeekStartDate, Mode=TwoWay}" 
                 HorizontalOptions="Center" />
 
-            <Label Text="{Binding WeekRangeDisplay, Mode=OneWay}"
-                   HorizontalOptions="Center"
-                   FontAttributes="Bold"
-                   FontSize="Medium" />
-
-            <!-- Navigation Buttons -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <Button Text="Previous Week" 
-                        Command="{Binding PreviousWeekCommand}" 
-                        Grid.Column="0" />
-                <DatePicker Date="{Binding SelectedWeekStartDate, Mode=TwoWay}" 
-                            Grid.Column="1" 
-                            HorizontalOptions="Center" />
-                <Button Text="Next Week" 
-                        Command="{Binding NextWeekCommand}" 
-                        Grid.Column="2" />
+                <!-- Peer Reviews Button -->
+                <Button Text="Peer Reviews >"
+                        FontFamily="Arial"
+                        FontAttributes="Bold"
+                    Command="{Binding NavigateToPeerReviewCommand}"
+                    HorizontalOptions="End" />
             </Grid>
+
 
             <CollectionView ItemsSource="{Binding StudentGroups}" Margin="0" VerticalOptions="Start">
                 <!-- Header -->

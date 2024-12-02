@@ -33,21 +33,6 @@ namespace MauiApp3
             SelectedWeekStartDate = GetStartOfWeek(DateTime.Now);
             _viewModel.SelectedWeekStartDate = SelectedWeekStartDate;
 
-            // Commands for navigation
-            PreviousWeekCommand = new Command(() =>
-            {
-                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(-7);
-                _viewModel.SelectedWeekStartDate = SelectedWeekStartDate; // Sync ViewModel
-                UpdateWeekRangeDisplay();
-            });
-
-            NextWeekCommand = new Command(() =>
-            {
-                SelectedWeekStartDate = SelectedWeekStartDate.AddDays(7);
-                _viewModel.SelectedWeekStartDate = SelectedWeekStartDate; // Sync ViewModel
-                UpdateWeekRangeDisplay();
-            });
-
             UpdateWeekRangeDisplay();
         }
 

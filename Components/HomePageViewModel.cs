@@ -118,8 +118,10 @@ namespace MauiApp3.Components
                 userGroup.UpdateFilteredTimeLogs(startOfWeek, endOfWeek);
             }
 
+            // Notify the view to refresh the UI
             OnPropertyChanged(nameof(UserGroups));
         }
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -223,18 +225,27 @@ namespace MauiApp3.Components
                         title = log.title,
                         timeLogEntries = log.timeLogEntries
                             .Where(entry => DateTime.Parse(entry.createdAt).Date >= selectedWeekStartDate.Date &&
-                                            DateTime.Parse(entry.createdAt) <= selectedWeekEndDate.Date)
+                                            DateTime.Parse(entry.createdAt).Date <= selectedWeekEndDate.Date)
                             .ToList()
                     })
                     .ToList();
+
+                // Recalculate WeeklyCumulativeHours
+                int totalWeeklyMinutes = FilteredTimeLogs.Sum(log => log.timeLogEntries.Sum(entry => entry.duration));
+                WeeklyCumulativeHours = totalWeeklyMinutes;
+                WeeklyCumulativeHoursFormatted = $"{totalWeeklyMinutes / 60:D2}:{totalWeeklyMinutes % 60:D2}";
             }
             else
             {
                 FilteredTimeLogs = new List<TimeLog>();
+                WeeklyCumulativeHours = 0;
+                WeeklyCumulativeHoursFormatted = "00:00";
             }
 
             OnPropertyChanged(nameof(FilteredTimeLogs));
+            OnPropertyChanged(nameof(WeeklyCumulativeHoursFormatted));
         }
+
 
         private bool _isExpandedForWeeklyHours;
         public bool IsExpandedForWeeklyHours
