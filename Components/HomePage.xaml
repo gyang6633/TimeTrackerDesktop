@@ -7,6 +7,10 @@
     <ScrollView>
         <StackLayout Padding="25" Spacing="25">
             <!-- Week Range Display -->
+            <Button Text="Peer Reviews"
+                Command="{Binding NavigateToPeerReviewCommand}"
+                HorizontalOptions="Center" />
+
             <Label Text="{Binding WeekRangeDisplay, Mode=OneWay}"
                    HorizontalOptions="Center"
                    FontAttributes="Bold"

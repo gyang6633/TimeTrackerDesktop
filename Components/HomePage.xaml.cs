@@ -11,6 +11,7 @@ namespace MauiApp3
         private readonly UserGroupsViewModel _viewModel;
         private DateTime _selectedWeekStartDate;
         private string _weekRangeDisplay;
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -22,6 +23,7 @@ namespace MauiApp3
         public HomePage()
         {
             InitializeComponent();
+            // Add a button to navigate to PeerReviewPage
 
             // Initialize ViewModel and bind it to the page
             _viewModel = new UserGroupsViewModel(this);

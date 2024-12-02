@@ -1,0 +1,64 @@
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MauiApp3.Components"
+             x:Class="MauiApp3.PeerReviewPage"
+             x:Name="PeerReviewPageInstance">
+    <ScrollView>
+        <VerticalStackLayout>
+            <Label Text="Peer Reviews" FontSize="24" HorizontalOptions="Center" Margin="10"/>
+            <CollectionView ItemsSource="{Binding StudentGroups}" SelectionMode="None">
+                <!-- Header -->
+                <CollectionView.Header>
+                    <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,*" BackgroundColor="#6200EA">
+                        <Label Grid.Column="0" Text="NetID" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                        <Label Grid.Column="1" Text="Group" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                        <Label Grid.Column="2" Text="First Name" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                        <Label Grid.Column="3" Text="Last Name" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                        <Label Grid.Column="4" Text="Reviews Received" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                        <Label Grid.Column="5" Text="Reviews Given" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                    </Grid>
+                </CollectionView.Header>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout>
+                            <Grid Padding="10" ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="Auto">
+                                <Label Grid.Column="0" Text="{Binding netID}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="1" Text="{Binding group}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="2" Text="{Binding firstName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="3" Text="{Binding lastName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                <!-- Expand/Collapse  -->
+                                <Label Grid.Column="4" Text="{Binding NumberReviewsReceived}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:PeerReviewPageViewModel}}, Path=ToggleReviewsReceivedCommand}"
+                                            CommandParameter="{Binding}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Grid.Column="5" Text="{Binding NumberReviewsGiven}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:PeerReviewPageViewModel}}, Path=ToggleReviewsGivenCommand}"
+                                            CommandParameter="{Binding}" />
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+
+                            <StackLayout IsVisible="{Binding IsReviewsRecievedExpanded}" Padding="10" BackgroundColor="#f9f9f9">
+                                <CollectionView ItemsSource="{Binding ReviewsReceived}" IsVisible="{Binding IsExpanded}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
+                                                <Label Text="{Binding PeerReviewId}" Grid.Column="0" />
+                                                <Label Text="{Binding ReviewerId}" Grid.Column="1" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

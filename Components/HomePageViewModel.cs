@@ -17,6 +17,8 @@ namespace MauiApp3.Components
 
         private DateTime _selectedWeekStartDate;
 
+        public ICommand NavigateToPeerReviewCommand { get; }
+
         public DateTime SelectedWeekStartDate
         {
             get => _selectedWeekStartDate;
@@ -56,6 +58,14 @@ namespace MauiApp3.Components
         {
             _page = page;
             _httpClient = new HttpClient();
+            NavigateToPeerReviewCommand = new Command(async () =>
+            {
+                // Log a message when the button is clicked
+                Console.WriteLine("NavigateToPeerReviewCommand executed!");
+
+                // Navigate to PeerReviewPage
+                await _page.Navigation.PushAsync(new PeerReviewPage());
+            });
             FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync());
             ToggleWeeklyExpandCommand = new Command<UserGroup>(ToggleWeeklyExpand);
             ToggleCumulativeExpandCommand = new Command<UserGroup>(ToggleCumulativeExpand);
@@ -226,10 +236,6 @@ namespace MauiApp3.Components
             OnPropertyChanged(nameof(FilteredTimeLogs));
         }
 
-
-
-
-
         private bool _isExpandedForWeeklyHours;
         public bool IsExpandedForWeeklyHours
         {
@@ -263,6 +269,63 @@ namespace MauiApp3.Components
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private List<PeerReview> _reviewsReceived;
+
+        public List<PeerReview> ReviewsReceived {
+            get => _reviewsReceived;
+            set
+            {
+                if (_reviewsReceived != value)
+                {
+                    _reviewsReceived = value;
+                    OnPropertyChanged(nameof(ReviewsReceived));
+                }
+            } 
+        }
+        private List<PeerReview> _reviewsGiven;
+
+        public List<PeerReview> ReviewsGiven {
+            get => _reviewsGiven;
+            set
+            {
+                if (_reviewsGiven != value)
+                {
+                    _reviewsGiven = value;
+                    OnPropertyChanged(nameof(ReviewsGiven));
+                }
+            } 
+        }
+        public int NumberReviewsReceived{ get; set; }
+        public int NumberReviewsGiven { get; set; }
+
+        private bool _isReviewsGivenExpanded;
+        public bool IsReviewsGivenExpanded
+        {
+            get => _isReviewsGivenExpanded;
+            set
+            {
+                if (_isReviewsGivenExpanded != value)
+                {
+                    _isReviewsGivenExpanded = value;
+                    OnPropertyChanged(nameof(IsReviewsGivenExpanded));
+                }
+            }
+        }
+
+        private bool _isReviewsReceivedExpanded;
+        public bool IsReviewsReceivedExpanded
+        {
+            get => _isReviewsReceivedExpanded;
+            set
+            {
+                if (_isReviewsReceivedExpanded != value)
+                {
+                    _isReviewsReceivedExpanded = value;
+                    OnPropertyChanged(nameof(IsReviewsReceivedExpanded));
+                }
+            }
         }
     }
 
