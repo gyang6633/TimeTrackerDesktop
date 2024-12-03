@@ -27,6 +27,22 @@ namespace MauiApp3.Components
                 }
             }
         }
+
+        private List<PeerReview> _peerReview;
+        public List<PeerReview> PeerReviews
+        {
+            get => _peerReview;
+            set
+            {
+                if (_peerReview != value)
+                {
+                    _peerReview = value;
+                    OnPropertyChanged(nameof(PeerReview));
+                  
+                }
+            }
+        }
+
         public List<UserGroup> StudentGroups =>
             _userGroups?.FindAll(group => string.Equals(group.role, "student", StringComparison.OrdinalIgnoreCase)) ?? new List<UserGroup>();
         public event PropertyChangedEventHandler PropertyChanged;
@@ -37,7 +53,7 @@ namespace MauiApp3.Components
 
         public ICommand FetchPeerReviewsCommand { get; }
         public ICommand ToggleReviewsGivenExpandCommand {get; }
-        private void ToggleReviewsGivenExpand(UserGroup userGroup)
+        private void ToggleReviewsGivenExpand(User userGroup)
         {
             if (userGroup != null)
             {
@@ -54,16 +70,16 @@ namespace MauiApp3.Components
         }
 
          public ICommand ToggleReviewsReceivedExpandCommand {get; }
-        private void ToggleReviewsReceivedExpand(UserGroup userGroup)
+        private void ToggleReviewsReceivedExpand(User user)
         {
-            if (userGroup != null)
+            if (user != null)
             {
-                userGroup.IsReviewsReceivedExpanded = !userGroup.IsReviewsReceivedExpanded;
+                user.IsReviewsReceivedExpanded = !user.IsReviewsReceivedExpanded;
 
                 // Collapse the other expansion
-                if (userGroup.IsReviewsReceivedExpanded)
+                if (user.IsReviewsReceivedExpanded)
                 {
-                    userGroup.IsReviewsReceivedExpanded = false;
+                    user.IsReviewsReceivedExpanded = false;
                 }
 
                 OnPropertyChanged(nameof(UserGroups));
@@ -81,14 +97,14 @@ namespace MauiApp3.Components
                 // Navigate to PeerReviewPage
                 await _page.Navigation.PushAsync(new CreatePRQPage());
             });
-            FetchPeerReviewsCommand = new Command(async () => await LoadPeerReviewsAsync());
-            ToggleReviewsGivenExpandCommand = new Command <UserGroup>(ToggleReviewsGivenExpand);
-            ToggleReviewsReceivedExpandCommand = new Command <UserGroup>(ToggleReviewsReceivedExpand);
-            LoadPeerReviewsAsync().ConfigureAwait(false);
+            FetchPeerReviewsCommand = new Command(async () => await LoadUserGroupsAsync());
+            ToggleReviewsGivenExpandCommand = new Command <User>(ToggleReviewsGivenExpand);
+            ToggleReviewsReceivedExpandCommand = new Command <User>(ToggleReviewsReceivedExpand);
+            LoadUserGroupsAsync().ConfigureAwait(false);
         }
 
 
-        private async Task LoadPeerReviewsAsync()
+        private async Task LoadUserGroupsAsync()
         {
             var url = "http://localhost:5264/api/user/groups";
 
@@ -102,6 +118,50 @@ namespace MauiApp3.Components
                 foreach (var groupProperty in jsonDocument.RootElement.EnumerateObject())
                 {
                     var userGroupList = JsonSerializer.Deserialize<List<UserGroup>>(groupProperty.Value.GetRawText());
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Handles camelCase mapping
+                        PropertyNameCaseInsensitive = true // Allows case-insensitive matching
+                    };
+                    foreach (var reviewer in userGroupList.Take(2)){
+                        reviewer.ReviewsGiven = reviewer.ReviewsGiven ?? new List<PeerReview>();
+                        foreach (var reviewee in userGroupList.Where(u => u.netID != reviewer.netID).Take(3)){
+                            
+                            var prUrl = $"http://localhost:5264/api/peerreviewanswer/reviewer/{reviewer.netID}/reviewee/{reviewee.netID}";
+                             try
+                            {
+                                // Fetch the inner API response
+                                var prResponseString = await _httpClient.GetStringAsync(prUrl);
+
+                                // Allow null responses
+                                if (!string.IsNullOrWhiteSpace(prResponseString))
+                                {
+                                    var peerReviews = JsonSerializer.Deserialize<List<PeerReview>>(prResponseString, options);
+                                    foreach (var peerReview in peerReviews){
+                                        if (peerReview != null)
+                                        {
+                                            // Add to reviewer and reviewee lists
+                                            reviewer.ReviewsGiven.Add(peerReview);
+                                            reviewee.NumberReviewsGiven += 1;
+                                            reviewee.ReviewsReceived = reviewee.ReviewsReceived ?? new List<PeerReview>();
+                                            reviewee.ReviewsReceived.Add(peerReview);
+                                            reviewer.NumberReviewsGiven += 1;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // Handle allowed null or empty responses
+                                    Console.WriteLine($"No peer review data found for reviewer {reviewer.netID} and reviewee {reviewee.netID}.");
+                                }
+                            }
+                            catch (Exception innerEx)
+                            {
+                                // Log inner API errors without breaking the outer loop
+                                Console.WriteLine($"Error fetching peer review for reviewer {reviewer.netID} and reviewee {reviewee.netID}: {innerEx.Message}");
+                            }
+                        }
+                    }
                     if (userGroupList != null)
                     {
                         allUserGroups.AddRange(userGroupList);
@@ -109,28 +169,7 @@ namespace MauiApp3.Components
                 }
 
                 UserGroups = allUserGroups;
-                await Application.Current.MainPage.DisplayAlert("Output", responseString, "OK");
-                //for each user in returned list of users
-                foreach (var userGroup in UserGroups)
-                {
-                    //count number of reviews
-                    int numReviewsGiven = 0;
-                    int numReviewsReceived = 0;
-                    //loop through all reviews 
-                    foreach (var review in userGroup.ReviewsGiven)
-                    {
-                        //increment per review
-                        numReviewsGiven += 1;
-                    }
-                    foreach (var review in userGroup.ReviewsReceived)
-                    {
-                        numReviewsReceived += 1;
-                    }
-                    //set property in user class
-                    userGroup.NumberReviewsGiven = numReviewsGiven;
-                    userGroup.NumberReviewsReceived = numReviewsReceived;
-                }
-
+                //await Application.Current.MainPage.DisplayAlert("Output", responseString, "OK");
             }
             catch (Exception ex)
             {
@@ -139,43 +178,86 @@ namespace MauiApp3.Components
         }
     }
 
+
+
     public class PeerReview
     {
         public int PeerReviewId { get; set; }
-        public string ReviewerId { get; set; }
-        public UserGroup Reviewer { get; set; }
-        public string RevieweeId { get; set; }
-        public UserGroup Reviewee { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public DateTime SubmittedAt { get; set; } = DateTime.Now;
+        public string ReviewerName { get; set; }
+        public string RevieweeName { get; set; }
+        public DateTime SubmittedAt { get; set; }
+        public List<PeerReviewAnswer> Answers { get; set; }
+    }
 
-        private bool _isExpandedForQuestions;
-        public bool IsExpandedForQuestions
+    public class PeerReviewAnswer
+    {
+        public string Question { get; set; }
+        public int NumericalFeedback { get; set; }
+        public string WrittenFeedback { get; set; }
+    }
+
+    public class User
+    {
+        public int Id { get; set; }
+        public string NetID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Role { get; set; }
+        public int Group { get; set; }
+
+        private bool _isReviewsGivenExpanded;
+        public bool IsReviewsGivenExpanded
         {
-            get => _isExpandedForQuestions;
+            get => _isReviewsGivenExpanded;
             set
             {
-                if (_isExpandedForQuestions != value)
+                if (_isReviewsGivenExpanded != value)
                 {
-                    _isExpandedForQuestions = value;
-                    OnPropertyChanged(nameof(IsExpandedForQuestions));
+                    _isReviewsGivenExpanded = value;
+                    OnPropertyChanged(nameof(IsReviewsGivenExpanded));
                 }
             }
         }
 
-        private bool _isExpandedForAnswers;
-        public bool IsExpandedForAnswers
+        private bool _isReviewsReceivedExpanded;
+        public bool IsReviewsReceivedExpanded
         {
-            get => _isExpandedForAnswers;
+            get => _isReviewsReceivedExpanded;
             set
             {
-                if (_isExpandedForAnswers != value)
+                if (_isReviewsReceivedExpanded != value)
                 {
-                    _isExpandedForAnswers = value;
-                    OnPropertyChanged(nameof(IsExpandedForAnswers));
+                    _isReviewsReceivedExpanded = value;
+                    OnPropertyChanged(nameof(IsReviewsReceivedExpanded));
                 }
             }
+        }
+      
+        private List<PeerReview> _reviewsReceived;
+        
+        public List<PeerReview> ReviewsReceived {
+            get => _reviewsReceived;
+            set
+            {
+                if (_reviewsReceived != value)
+                {
+                    _reviewsReceived = value;
+                    OnPropertyChanged(nameof(ReviewsReceived));
+                }
+            } 
+        }
+        private List<PeerReview> _reviewsGiven;
+
+        public List<PeerReview> ReviewsGiven {
+            get => _reviewsGiven;
+            set
+            {
+                if (_reviewsGiven != value)
+                {
+                    _reviewsGiven = value;
+                    OnPropertyChanged(nameof(ReviewsGiven));
+                }
+            } 
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -184,24 +266,6 @@ namespace MauiApp3.Components
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-    public class PeerReviewAnswer
-    {
-        public int PeerReviewAnswerId { get; set; } // The answer ID
-
-        // Foreign key to PeerReview and PeerReviewQuestion
-        public int PeerReviewId { get; set; } // The review ID for this answer
-        public required PeerReview PeerReview { get; set; } // Navigation property to the PeerReview
-
-        public int PeerReviewQuestionId { get; set; } // The question ID for this answer
-        public required PeerReviewQuestion PeerReviewQuestion { get; set; } // Navigation property to the PeerReviewQuestion
-
-        // Answer details
-        public int NumericalFeedback { get; set; }  // Numerical score for this specific question
-        public required string WrittenFeedback { get; set; } // Written feedback for this specific question
-    }
-        public class PeerReviewQuestion
-    {
-        public int PeerReviewQuestionId { get; set; } // The question ID
-        public required string QuestionText { get; set; }  // The question text
-    }
 }
+    
+

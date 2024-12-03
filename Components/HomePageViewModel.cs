@@ -281,10 +281,36 @@ namespace MauiApp3.Components
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public List<PeerReview> ReviewsGiven{get; set;}
-        public List<PeerReview> ReviewsReceived{get; set;}
-        public int NumberReviewsReceived{ get; set; }
-        public int NumberReviewsGiven { get; set; }
+
+        private int _numberReviewsGiven;
+        public int NumberReviewsGiven
+        {
+            get => _numberReviewsGiven;
+            set
+            {
+                if (_numberReviewsGiven != value)
+                {
+                    _numberReviewsGiven = value;
+                    OnPropertyChanged(nameof(NumberReviewsGiven)); // Only needed if bound to the UI
+                }
+            }
+        }
+
+        private int _numberReviewsReceived;
+        public int NumberReviewsReceived
+        {
+            get => _numberReviewsReceived;
+            set
+            {
+                if (_numberReviewsReceived != value)
+                {
+                    _numberReviewsReceived = value;
+                    OnPropertyChanged(nameof(NumberReviewsReceived)); // Only needed if bound to the UI
+                }
+            }
+        }
+
+
         private bool _isReviewsGivenExpanded;
         public bool IsReviewsGivenExpanded
         {
@@ -312,7 +338,7 @@ namespace MauiApp3.Components
                 }
             }
         }
-        /*
+        
         private List<PeerReview> _reviewsReceived;
         
         public List<PeerReview> ReviewsReceived {
@@ -339,7 +365,6 @@ namespace MauiApp3.Components
                 }
             } 
         }
-        */
     }
 
 

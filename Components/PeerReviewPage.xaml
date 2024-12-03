@@ -48,15 +48,27 @@
                                 </Label>
                             </Grid>
 
-                            <StackLayout IsVisible="{Binding IsReviewsReceivedExpanded}" Padding="10" BackgroundColor="#f9f9f9">
+                            <StackLayout Padding="10" BackgroundColor="#333333">
                                 <Label Text="Reviews Received" FontAttributes="Bold" />
                                 <CollectionView ItemsSource="{Binding ReviewsReceived}">
+                                     <!-- Header for grid -->
+                                <CollectionView.Header>
+                                    <Grid Padding="5" ColumnDefinitions="*,*,*" BackgroundColor="#6200EA">
+                                        <Label Grid.Column="0" Text="Peer Review ID" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                                        <Label Grid.Column="1" Text="Reviewer" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                                        <Label Grid.Column="2" Text="Reviewee" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
+                                    </Grid>
+                                </CollectionView.Header>
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                                <Label Text="{Binding PeerReviewId}" Grid.Column="0" />
-                                                <Label Text="{Binding ReviewerId}" Grid.Column="1" />
-                                            </Grid>
+                                            <StackLayout>
+                                                <!-- Main PeerReview Details -->
+                                                <Grid ColumnDefinitions="*,*,*">
+                                                    <Label Grid.Column="0" Text="{Binding PeerReviewId}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="1" Text="{Binding ReviewerName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="2" Text="{Binding RevieweeName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                </Grid>
+                                            </StackLayout>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
                                 </CollectionView>
