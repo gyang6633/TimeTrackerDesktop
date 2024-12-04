@@ -314,6 +314,8 @@ namespace MauiApp3.Components
 
         public List<User> Users { get; set; }
 
+        public string ReviewsReceivedHeader => $"Reviews Received for {firstName} {lastName}";
+
         private bool _isReviewsGivenExpanded;
         public bool IsReviewsGivenExpanded
         {
