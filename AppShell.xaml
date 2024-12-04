@@ -6,10 +6,4 @@
     xmlns:local="clr-namespace:MauiApp3"
     Shell.FlyoutBehavior="Disabled"
     Title="MauiApp3">
-
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-
 </Shell>

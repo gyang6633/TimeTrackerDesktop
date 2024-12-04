@@ -10,9 +10,6 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Register the BooleanToImageConverter -->
-            <components:BooleanToImageConverter x:Key="BooleanToImageConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
