@@ -29,7 +29,7 @@
     <AppXManifest Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2024-11-21T05:42:29.557</Modified>
+      <Modified>2024-12-04T18:06:49.259</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
@@ -39,15 +39,15 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\MauiApp3.runtimeconfig.json">
       <PackagePath>MauiApp3.runtimeconfig.json</PackagePath>
-      <Modified>2024-11-20T23:22:50.491</Modified>
+      <Modified>2024-12-03T17:14:35.866</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\MauiApp3.dll">
       <PackagePath>MauiApp3.dll</PackagePath>
-      <Modified>2024-11-21T05:42:28.413</Modified>
+      <Modified>2024-12-04T18:06:47.905</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\obj\Debug\net8.0-windows10.0.19041.0\win10-x64\apphost.exe">
       <PackagePath>MauiApp3.exe</PackagePath>
-      <Modified>2024-11-21T05:42:28.438</Modified>
+      <Modified>2024-12-04T18:06:47.937</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\Resources\Raw\AboutAssets.txt">
       <PackagePath>AboutAssets.txt</PackagePath>
@@ -295,7 +295,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\MauiApp3.deps.json">
       <PackagePath>MauiApp3.deps.json</PackagePath>
-      <Modified>2024-11-20T23:22:50.144</Modified>
+      <Modified>2024-12-03T17:14:35.356</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\.nuget\packages\microsoft.windows.sdk.net.ref\10.0.19041.34\lib\net6.0\Microsoft.Windows.SDK.NET.dll">
       <PackagePath>Microsoft.Windows.SDK.NET.dll</PackagePath>

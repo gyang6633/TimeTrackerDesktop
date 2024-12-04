@@ -110,7 +110,7 @@ namespace MauiApp3.Components
 
             try
             {
-               var responseString = await _httpClient.GetStringAsync(url);
+                var responseString = await _httpClient.GetStringAsync(url);
                 var jsonDocument = JsonDocument.Parse(responseString);
 
                 var allUserGroups = new List<UserGroup>();
@@ -123,45 +123,53 @@ namespace MauiApp3.Components
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Handles camelCase mapping
                         PropertyNameCaseInsensitive = true // Allows case-insensitive matching
                     };
-                    foreach (var reviewer in userGroupList.Take(2)){
+
+                    foreach (var reviewer in userGroupList.Take(2))
+                    {
+                        // Initialize ReviewsGiven for the reviewer
                         reviewer.ReviewsGiven = reviewer.ReviewsGiven ?? new List<PeerReview>();
-                        foreach (var reviewee in userGroupList.Where(u => u.netID != reviewer.netID).Take(3)){
-                            
+
+                        foreach (var reviewee in userGroupList.Where(u => u.netID != reviewer.netID).Take(3))
+                        {
+                            // Fetch peer reviews for each reviewer-reviewee pair
                             var prUrl = $"http://localhost:5264/api/peerreviewanswer/reviewer/{reviewer.netID}/reviewee/{reviewee.netID}";
-                             try
+                            try
                             {
-                                // Fetch the inner API response
                                 var prResponseString = await _httpClient.GetStringAsync(prUrl);
 
-                                // Allow null responses
+                                // Deserialize peer reviews
                                 if (!string.IsNullOrWhiteSpace(prResponseString))
                                 {
                                     var peerReviews = JsonSerializer.Deserialize<List<PeerReview>>(prResponseString, options);
-                                    foreach (var peerReview in peerReviews){
+                                    foreach (var peerReview in peerReviews)
+                                    {
                                         if (peerReview != null)
                                         {
-                                            // Add to reviewer and reviewee lists
+                                            // Add to reviewer's list of ReviewsGiven
                                             reviewer.ReviewsGiven.Add(peerReview);
-                                            reviewee.NumberReviewsGiven += 1;
+                                            reviewer.NumberReviewsGiven += 1;
+
+                                            // Add to reviewee's list of ReviewsReceived
                                             reviewee.ReviewsReceived = reviewee.ReviewsReceived ?? new List<PeerReview>();
                                             reviewee.ReviewsReceived.Add(peerReview);
-                                            reviewer.NumberReviewsGiven += 1;
+                                            reviewee.NumberReviewsReceived += 1;
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    // Handle allowed null or empty responses
+                                    // Log if no data found
                                     Console.WriteLine($"No peer review data found for reviewer {reviewer.netID} and reviewee {reviewee.netID}.");
                                 }
                             }
                             catch (Exception innerEx)
                             {
-                                // Log inner API errors without breaking the outer loop
+                                // Log errors for individual reviewer-reviewee pairs
                                 Console.WriteLine($"Error fetching peer review for reviewer {reviewer.netID} and reviewee {reviewee.netID}: {innerEx.Message}");
                             }
                         }
                     }
+
                     if (userGroupList != null)
                     {
                         allUserGroups.AddRange(userGroupList);
@@ -169,11 +177,13 @@ namespace MauiApp3.Components
                 }
 
                 UserGroups = allUserGroups;
-                //await Application.Current.MainPage.DisplayAlert("Output", responseString, "OK");
+
+                // Notify UI
+                OnPropertyChanged(nameof(UserGroups));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching peer reviews: {ex.Message}");
+                Console.WriteLine($"Error fetching peer reviews");
             }
         }
     }

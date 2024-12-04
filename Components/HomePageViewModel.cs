@@ -310,6 +310,9 @@ namespace MauiApp3.Components
             }
         }
 
+        public bool HasReviewsReceived => _numberReviewsReceived > 0;
+
+        public List<User> Users { get; set; }
 
         private bool _isReviewsGivenExpanded;
         public bool IsReviewsGivenExpanded

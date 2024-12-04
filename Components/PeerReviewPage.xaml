@@ -1,4 +1,3 @@
-
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MauiApp3.Components"
@@ -7,8 +6,8 @@
     <ScrollView>
         <VerticalStackLayout>
             <!-- Header with Title and Plus Button -->
-            <Grid Padding="10" ColumnDefinitions="*,Auto" BackgroundColor="#6200EA">
-                <Label Text="Peer Reviews" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="White" Grid.Column="0" />
+            <Grid Padding="10" ColumnDefinitions="*,Auto">
+                <Label Text="Peer Reviews" FontSize="24" FontAttributes="Bold" FontFamily="Arial" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="Black" Grid.Column="0" />
                 <Button Text="+" FontAttributes="Bold" FontSize="18" BackgroundColor="White" TextColor="#6200EA" 
                         Command="{Binding NavigateToCreatePRQCommand}" Grid.Column="1" />
             </Grid>
@@ -48,26 +47,40 @@
                                 </Label>
                             </Grid>
 
-                            <StackLayout Padding="10" BackgroundColor="#333333">
-                                <Label Text="Reviews Received" FontAttributes="Bold" />
+                            <StackLayout Padding="10" BackgroundColor="White">
+                                <Label Text="Reviews Received" FontAttributes="Bold" TextColor="White" BackgroundColor="#BF6200EA" HorizontalTextAlignment="Center" IsVisible="{Binding HasReviewsReceived}"/>                          
                                 <CollectionView ItemsSource="{Binding ReviewsReceived}">
-                                     <!-- Header for grid -->
-                                <CollectionView.Header>
-                                    <Grid Padding="5" ColumnDefinitions="*,*,*" BackgroundColor="#6200EA">
-                                        <Label Grid.Column="0" Text="Peer Review ID" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
-                                        <Label Grid.Column="1" Text="Reviewer" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
-                                        <Label Grid.Column="2" Text="Reviewee" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="White" />
-                                    </Grid>
-                                </CollectionView.Header>
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>
                                             <StackLayout>
                                                 <!-- Main PeerReview Details -->
-                                                <Grid ColumnDefinitions="*,*,*">
-                                                    <Label Grid.Column="0" Text="{Binding PeerReviewId}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                                    <Label Grid.Column="1" Text="{Binding ReviewerName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                                    <Label Grid.Column="2" Text="{Binding RevieweeName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                                </Grid>
+                                                <StackLayout Padding="5" Spacing="5">
+                                                    <Label Text="Reviewer:" FontAttributes="Bold" />
+                                                    <Label Text="{Binding ReviewerName}" />
+                                                    <Label Text="Reviewee:" FontAttributes="Bold" />
+                                                    <Label Text="{Binding RevieweeName}" />
+                                                </StackLayout>
+                                                <!-- Nested CollectionView for Answers -->
+                                                <CollectionView ItemsSource="{Binding Answers}">
+                                                    <CollectionView.Header>
+                                                        <Grid Padding="5" ColumnDefinitions="*,*,*" BackgroundColor="#E8E8E8">
+                                                            <Label Grid.Column="0" Text="Question" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="Black" />
+                                                            <Label Grid.Column="1" Text="Written Feedback" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="Black" />
+                                                            <Label Grid.Column="2" Text="Numerical Score" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="Black" />
+                                                        </Grid>
+                                                    </CollectionView.Header>
+                                                    <CollectionView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackLayout>
+                                                                <Grid ColumnDefinitions="*,*,*">
+                                                                    <Label Grid.Column="0" Text="{Binding Question}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="1" Text="{Binding WrittenFeedback}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                    <Label Grid.Column="2" Text="{Binding NumericalFeedback}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+                                                                </Grid>
+                                                            </StackLayout>
+                                                        </DataTemplate>
+                                                    </CollectionView.ItemTemplate>
+                                                </CollectionView>
                                             </StackLayout>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>
