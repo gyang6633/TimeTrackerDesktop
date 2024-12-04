@@ -78,12 +78,32 @@ namespace MauiApp3
 
             try
             {
-                var newQuestion = new PeerReviewQuestion { QuestionText = NewQuestionText };
-                var content = new StringContent(JsonSerializer.Serialize(newQuestion), System.Text.Encoding.UTF8, "application/json");
+                // Prepare form data
+                var formData = new Dictionary<string, string>
+                {
+                    { "QuestionText", NewQuestionText }
+                };
+
+                var content = new FormUrlEncodedContent(formData);
+
+                // Make POST request
                 var response = await _httpClient.PostAsync("http://localhost:5264/api/peerreviewquestion", content);
+
                 if (response.IsSuccessStatusCode)
                 {
-                    Questions.Add(newQuestion);
+                    // Assuming the backend returns the created PeerReviewQuestion object
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var createdQuestion = JsonSerializer.Deserialize<PeerReviewQuestion>(responseString, options);
+
+                    if (createdQuestion != null)
+                    {
+                        Questions.Add(createdQuestion);
+                    }
+
                     NewQuestionText = string.Empty;
                 }
                 else
@@ -96,7 +116,6 @@ namespace MauiApp3
                 await Application.Current.MainPage.DisplayAlert("Error", $"Error submitting question: {ex.Message}", "OK");
             }
         }
-
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

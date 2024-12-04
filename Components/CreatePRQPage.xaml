@@ -1,24 +1,74 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp3.CreatePRQPage">
-    <Grid RowDefinitions="Auto,*" ColumnDefinitions="1*,1*">
+             x:Class="MauiApp3.CreatePRQPage"
+             BackgroundColor="#f9f9f9">
+    <ContentPage.Resources>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="#333" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#6200EA" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="HeightRequest" Value="45" />
+        </Style>
+        <Style TargetType="Entry">
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="TextColor" Value="#333" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="Margin" Value="0,5,0,10" />
+        </Style>
+        <Style TargetType="CollectionView">
+            <Setter Property="BackgroundColor" Value="White" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="Auto">
+        <!-- Header -->
+        <StackLayout Grid.Row="0" Padding="20" BackgroundColor="#6200EA">
+            <Label Text="Create Peer Review Question"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Start" />
+        </StackLayout>
+
         <!-- Input Section -->
-        <StackLayout Grid.Row="0" Padding="10">
-            <Label Text="Create Peer Review Question" FontSize="24" HorizontalOptions="Start" Margin="0,10,0,10" />
-            <Entry Placeholder="Enter question text" Text="{Binding NewQuestionText}" />
-            <Button Text="Submit Question" Command="{Binding SubmitQuestionCommand}" Margin="0,10,0,0" />
+        <StackLayout Grid.Row="1" Padding="20">
+            <Label Text="Enter your question below:" 
+                   FontSize="18" 
+                   FontAttributes="Bold" 
+                   Margin="0,0,0,5" />
+            <Entry Placeholder="Type your question here" 
+                   Text="{Binding NewQuestionText}" />
+            <Button Text="Submit Question"
+                    Command="{Binding SubmitQuestionCommand}"
+                    Margin="0,10,0,10" />
         </StackLayout>
 
         <!-- List of Questions -->
-        <StackLayout Grid.Row="1" Grid.ColumnSpan="2" Padding="10">
-            <Label Text="Current Questions" FontSize="20" HorizontalOptions="Start" />
-            <CollectionView ItemsSource="{Binding Questions}">
+        <StackLayout Grid.Row="2" Padding="20">
+            <Label Text="Current Questions" 
+                   FontSize="22" 
+                   FontAttributes="Bold"
+                   Margin="0,0,0,10" />
+            <CollectionView ItemsSource="{Binding Questions}" 
+                            BackgroundColor="#f5f5f5" 
+                            Margin="0,0,0,10">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <StackLayout>
-                            <!-- Binding to the QuestionText property -->
-                            <Label Text="{Binding QuestionText}" FontSize="16" />
-                        </StackLayout>
+                        <Frame BackgroundColor="White"
+                               CornerRadius="6"
+                               Padding="10"
+                               Margin="0,5,0,5"
+                               BorderColor="#e0e0e0">
+                            <StackLayout>
+                                <Label Text="{Binding QuestionText}" 
+                                       FontSize="16" 
+                                       TextColor="#555" />
+                            </StackLayout>
+                        </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
