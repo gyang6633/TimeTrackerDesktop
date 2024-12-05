@@ -29,7 +29,7 @@
     <AppXManifest Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2024-12-04T23:28:14.873</Modified>
+      <Modified>2024-12-05T19:25:06.299</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
@@ -43,11 +43,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\bin\Debug\net8.0-windows10.0.19041.0\win10-x64\MauiApp3.dll">
       <PackagePath>MauiApp3.dll</PackagePath>
-      <Modified>2024-12-04T23:28:10.126</Modified>
+      <Modified>2024-12-05T19:25:05.064</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\obj\Debug\net8.0-windows10.0.19041.0\win10-x64\apphost.exe">
       <PackagePath>MauiApp3.exe</PackagePath>
-      <Modified>2024-12-04T23:28:10.400</Modified>
+      <Modified>2024-12-05T19:25:05.095</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Grace\source\repos\MauiApp3\MauiApp3\Resources\Raw\AboutAssets.txt">
       <PackagePath>AboutAssets.txt</PackagePath>

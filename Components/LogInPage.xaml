@@ -1,14 +1,19 @@
+<!-- Written by Grace and Eric -->
+<!-- This is the UI for the login screen -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MauiApp3.Components"
              x:Class="MauiApp3.LogInPage"
              BackgroundColor="Black">
-
+    
     <ContentPage.BindingContext>
         <vm:LoginViewModel/>
+        <!-- Binds the LoginViewModel to this page, enabling data binding for properties and commands -->
     </ContentPage.BindingContext>
-
+    
+    <!-- The main content page for the login screen -->
     <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+        <!-- The title of the login page -->
         <Label Text="Time Tracker"
                TextColor="White"
                FontFamily="Arial"
@@ -16,19 +21,27 @@
                FontAttributes="Bold"
                HorizontalOptions="Center"
                Margin="0, 0, 0, 20"/>
-
+        
+        <!-- Label for the NetID input field -->
         <Label Text="NetID"
                TextColor="White"
                FontFamily="Arial"/>
+        
+        <!-- Entry field for the user to input their NetID -->
+        <!-- Bound to the NetID property in the LoginViewModel -->
         <Entry Text="{Binding NetID}"
                Placeholder="Enter your NetID"
                WidthRequest="300"
                BackgroundColor="White"
                Margin="0, 10, 0, 15"/>
 
+        <!-- Label for the password input field -->
         <Label Text="Password"
                TextColor="White"
                FontFamily="Arial"/>
+        
+        <!-- Entry field for the user to input their password -->
+        <!-- Bound to the Password property in the LoginViewModel -->
         <Entry Text="{Binding Password}"
                Placeholder="Enter your password"
                IsPassword="True"
@@ -36,6 +49,7 @@
                WidthRequest="300"
                Margin="0, 10, 0, 15"/>
 
+        <!-- Executes the LoginCommand from the LoginViewModel when clicked -->
         <Button Text="Login"
                 Command="{Binding LoginCommand}"
                 FontFamily="Arial"

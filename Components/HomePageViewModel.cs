@@ -1,3 +1,5 @@
+// Written by Grace Y.
+// This is the ViewModel to manage user groups and their data
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,14 +13,16 @@ namespace MauiApp3.Components
 {
     public class UserGroupsViewModel : INotifyPropertyChanged
     {
-        private List<UserGroup> _userGroups;
-        private readonly HttpClient _httpClient;
-        private readonly Page _page;
+        private List<UserGroup> _userGroups; // Stores the list of user groups
+        private readonly HttpClient _httpClient; // HttpClient for API communication
+        private readonly Page _page; // Reference to the current page for navigation and UI updates
 
-        private DateTime _selectedWeekStartDate;
+        private DateTime _selectedWeekStartDate; // Selected start date of the week
 
+        // Navigates to the Peer Review page
         public ICommand NavigateToPeerReviewCommand { get; }
 
+        // Property for the selected start date of the week, triggers updates when changed
         public DateTime SelectedWeekStartDate
         {
             get => _selectedWeekStartDate;
@@ -27,12 +31,13 @@ namespace MauiApp3.Components
                 if (_selectedWeekStartDate != value)
                 {
                     _selectedWeekStartDate = value;
-                    OnPropertyChanged(nameof(SelectedWeekStartDate));
-                    UpdateFilteredTimeLogs();
+                    OnPropertyChanged(nameof(SelectedWeekStartDate)); // Notify UI of change
+                    UpdateFilteredTimeLogs(); // Update logs when the date changes
                 }
             }
         }
 
+        // Property to store the user groups, triggers updates
         public List<UserGroup> UserGroups
         {
             get => _userGroups;
@@ -41,61 +46,66 @@ namespace MauiApp3.Components
                 if (_userGroups != value)
                 {
                     _userGroups = value;
-                    OnPropertyChanged(nameof(UserGroups));
-                    OnPropertyChanged(nameof(StudentGroups));
+                    OnPropertyChanged(nameof(UserGroups)); // Notify UI
+                    OnPropertyChanged(nameof(StudentGroups)); // Notify dependent property
                 }
             }
         }
 
+        // Filters user groups for students only
         public List<UserGroup> StudentGroups =>
             _userGroups?.FindAll(group => string.Equals(group.role, "student", StringComparison.OrdinalIgnoreCase)) ?? new List<UserGroup>();
 
+        // Command to fetch user groups from the backend API
         public ICommand FetchUserGroupsCommand { get; }
+        // Command to toggle the weekly hours expansion for a user group
         public ICommand ToggleWeeklyExpandCommand { get; }
+        // Command to toggle the cumulative hours expansion for a user group
         public ICommand ToggleCumulativeExpandCommand { get; }
 
+        // Constructor to initialize the ViewModel
         public UserGroupsViewModel(Page page)
         {
             _page = page;
             _httpClient = new HttpClient();
+            // Command to navigate to the Peer Review page
             NavigateToPeerReviewCommand = new Command(async () =>
             {
-                // Log a message when the button is clicked
-                Console.WriteLine("NavigateToPeerReviewCommand executed!");
-
                 // Navigate to PeerReviewPage
                 await _page.Navigation.PushAsync(new PeerReviewPage());
             });
-            FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync());
-            ToggleWeeklyExpandCommand = new Command<UserGroup>(ToggleWeeklyExpand);
-            ToggleCumulativeExpandCommand = new Command<UserGroup>(ToggleCumulativeExpand);
+            FetchUserGroupsCommand = new Command(async () => await FetchUserGroupsAsync()); // Initialize fetch command
+            ToggleWeeklyExpandCommand = new Command<UserGroup>(ToggleWeeklyExpand); // Initialize weekly toggle command
+            ToggleCumulativeExpandCommand = new Command<UserGroup>(ToggleCumulativeExpand); // Initialize cumulative toggle command
             SelectedWeekStartDate = DateTime.Now; // Initialize with the current week
-            FetchUserGroupsAsync().ConfigureAwait(false);
+            FetchUserGroupsAsync().ConfigureAwait(false); // Fetch data from API
         }
 
+        // Method to toggle the weekly hours expansion for a specific user group
         private void ToggleWeeklyExpand(UserGroup userGroup)
         {
             if (userGroup != null)
             {
                 userGroup.IsExpandedForWeeklyHours = !userGroup.IsExpandedForWeeklyHours;
 
-                // Collapse the other expansion
+                // Collapse cumulative hours if weekly hours are expanded
                 if (userGroup.IsExpandedForWeeklyHours)
                 {
                     userGroup.IsExpandedForCumulativeHours = false;
                 }
 
-                OnPropertyChanged(nameof(UserGroups));
+                OnPropertyChanged(nameof(UserGroups)); // Notify UI to refresh
             }
         }
 
+        // Method to toggle the cumulative hours expansion for a specific user group
         private void ToggleCumulativeExpand(UserGroup userGroup)
         {
             if (userGroup != null)
             {
                 userGroup.IsExpandedForCumulativeHours = !userGroup.IsExpandedForCumulativeHours;
 
-                // Collapse the other expansion
+                // Collapse weekly hours if cumulative hours are expanded
                 if (userGroup.IsExpandedForCumulativeHours)
                 {
                     userGroup.IsExpandedForWeeklyHours = false;
@@ -105,43 +115,47 @@ namespace MauiApp3.Components
             }
         }
 
+        // Updates filtered time logs for each user group based on the selected week
         private void UpdateFilteredTimeLogs()
         {
             if (UserGroups == null || !UserGroups.Any())
                 return;
 
-            var startOfWeek = SelectedWeekStartDate;
-            var endOfWeek = startOfWeek.AddDays(6);
+            var startOfWeek = SelectedWeekStartDate; // Start date of the week
+            var endOfWeek = startOfWeek.AddDays(6); // End date of the week
 
             foreach (var userGroup in UserGroups)
             {
-                userGroup.UpdateFilteredTimeLogs(startOfWeek, endOfWeek);
+                userGroup.UpdateFilteredTimeLogs(startOfWeek, endOfWeek); // Update filtered logs
             }
 
             // Notify the view to refresh the UI
-            OnPropertyChanged(nameof(UserGroups));
+            OnPropertyChanged(nameof(UserGroups)); 
         }
 
 
-
+        // Event for property change notification
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // Method to raise property change notifications
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // Fetches user groups from the backend API
         private async Task FetchUserGroupsAsync()
         {
-            var url = "http://localhost:5264/api/user/groups";
+            var url = "http://localhost:5264/api/user/groups"; // API endpoint
 
             try
             {
-                var responseString = await _httpClient.GetStringAsync(url);
-                var jsonDocument = JsonDocument.Parse(responseString);
+                var responseString = await _httpClient.GetStringAsync(url); // Fetch response as string
+                var jsonDocument = JsonDocument.Parse(responseString); // Parse JSON
 
                 var allUserGroups = new List<UserGroup>();
 
+                // Deserialize each user group from the JSON
                 foreach (var groupProperty in jsonDocument.RootElement.EnumerateObject())
                 {
                     var userGroupList = JsonSerializer.Deserialize<List<UserGroup>>(groupProperty.Value.GetRawText());
@@ -151,13 +165,16 @@ namespace MauiApp3.Components
                     }
                 }
 
-                UserGroups = allUserGroups;
+                UserGroups = allUserGroups; // Assign the fetched user groups
 
+                // Calculate and format weekly and cumulative hours for each user group
                 foreach (var userGroup in UserGroups)
                 {
-                    int totalCumulativeMinutes = 0;
+                    // Loop through the time logs and calculate the hours/mins spent
+                    int totalCumulativeMinutes = 0; // For cumulative minutes
                     foreach (var timeLog in userGroup.timeLogs)
                     {
+                        // For weekly minutes
                         int totalWeeklyMinutes = 0;
                         foreach (var entry in timeLog.timeLogEntries)
                         {
@@ -171,7 +188,7 @@ namespace MauiApp3.Components
                     userGroup.TotalCumulativeHoursFormatted = $"{totalCumulativeMinutes / 60:D2}:{totalCumulativeMinutes % 60:D2}";
                 }
 
-                UpdateFilteredTimeLogs();
+                UpdateFilteredTimeLogs(); // Refresh filtered logs
             }
             catch (Exception ex)
             {
@@ -181,7 +198,7 @@ namespace MauiApp3.Components
     }
 
 
-
+    // Represents a user group with properties and logic for managing time logs
     public class UserGroup : INotifyPropertyChanged
     {
         public int id { get; set; }
@@ -195,7 +212,8 @@ namespace MauiApp3.Components
         public string WeeklyCumulativeHoursFormatted { get; set; }
         public int TotalCumulativeHours { get; set; }
         public string TotalCumulativeHoursFormatted { get; set; }
-
+        
+        // Filtering time log properties and logic
         private List<TimeLog> _filteredTimeLogs;
         public List<TimeLog> FilteredTimeLogs
         {
@@ -210,6 +228,7 @@ namespace MauiApp3.Components
             }
         }
 
+        // Updating the filtered time logs 
         public void UpdateFilteredTimeLogs(DateTime selectedWeekStartDate, DateTime selectedWeekEndDate)
         {
             if (timeLogs != null)
@@ -237,6 +256,7 @@ namespace MauiApp3.Components
             }
             else
             {
+                // If no minutes, then set the weekly cumulative hours to 0
                 FilteredTimeLogs = new List<TimeLog>();
                 WeeklyCumulativeHours = 0;
                 WeeklyCumulativeHoursFormatted = "00:00";
@@ -246,7 +266,7 @@ namespace MauiApp3.Components
             OnPropertyChanged(nameof(WeeklyCumulativeHoursFormatted));
         }
 
-
+        // For the expanded weekly hours property and logic 
         private bool _isExpandedForWeeklyHours;
         public bool IsExpandedForWeeklyHours
         {
@@ -261,6 +281,7 @@ namespace MauiApp3.Components
             }
         }
 
+        // For the expanded cumulative hours property and logic
         private bool _isExpandedForCumulativeHours;
         public bool IsExpandedForCumulativeHours
         {
@@ -276,12 +297,12 @@ namespace MauiApp3.Components
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // Number of reviews given to student for Peer Review
         private int _numberReviewsGiven;
         public int NumberReviewsGiven
         {
@@ -291,11 +312,12 @@ namespace MauiApp3.Components
                 if (_numberReviewsGiven != value)
                 {
                     _numberReviewsGiven = value;
-                    OnPropertyChanged(nameof(NumberReviewsGiven)); // Only needed if bound to the UI
+                    OnPropertyChanged(nameof(NumberReviewsGiven));
                 }
             }
         }
 
+        // Number of reviews received by student for Peer Review
         private int _numberReviewsReceived;
         public int NumberReviewsReceived
         {
@@ -305,47 +327,21 @@ namespace MauiApp3.Components
                 if (_numberReviewsReceived != value)
                 {
                     _numberReviewsReceived = value;
-                    OnPropertyChanged(nameof(NumberReviewsReceived)); // Only needed if bound to the UI
+                    OnPropertyChanged(nameof(NumberReviewsReceived)); 
                 }
             }
         }
 
+        // If user has reviews received, display them 
         public bool HasReviewsReceived => _numberReviewsReceived > 0;
 
         public List<User> Users { get; set; }
 
+        // Header for the reviews received
         public string ReviewsReceivedHeader => $"Reviews Received for {firstName} {lastName}";
 
-        private bool _isReviewsGivenExpanded;
-        public bool IsReviewsGivenExpanded
-        {
-            get => _isReviewsGivenExpanded;
-            set
-            {
-                if (_isReviewsGivenExpanded != value)
-                {
-                    _isReviewsGivenExpanded = value;
-                    OnPropertyChanged(nameof(IsReviewsGivenExpanded));
-                }
-            }
-        }
-
-        private bool _isReviewsReceivedExpanded;
-        public bool IsReviewsReceivedExpanded
-        {
-            get => _isReviewsReceivedExpanded;
-            set
-            {
-                if (_isReviewsReceivedExpanded != value)
-                {
-                    _isReviewsReceivedExpanded = value;
-                    OnPropertyChanged(nameof(IsReviewsReceivedExpanded));
-                }
-            }
-        }
-        
+        // Reviews received
         private List<PeerReview> _reviewsReceived;
-        
         public List<PeerReview> ReviewsReceived {
             get => _reviewsReceived;
             set
@@ -372,24 +368,24 @@ namespace MauiApp3.Components
         }
     }
 
-
-
+    // Represents a time log with associated entries
     public class TimeLog
         {
-            public int id { get; set; }
-            public int userId { get; set; }
-            public string title { get; set; }
-            public List<TimeLogEntry> timeLogEntries { get; set; }
+            public int id { get; set; } // Time log ID
+            public int userId { get; set; } // Associated User ID
+            public string title { get; set; } // Title of time log
+            public List<TimeLogEntry> timeLogEntries { get; set; } // List of time log entries
         }
 
+        // Represents an individual entry in a time log
         public class TimeLogEntry
         {
-            public int id { get; set; }
-            public int timeLogId { get; set; }
-            public int duration { get; set; }
-            public string DurationFormatted => $"{duration / 60:D2}:{duration % 60:D2}";
-            public string description { get; set; }
-            public string createdAt { get; set; }
+            public int id { get; set; } // Entry ID
+            public int timeLogId { get; set; } // Associated time log ID
+            public int duration { get; set; } // Duration in minutes
+            public string DurationFormatted => $"{duration / 60:D2}:{duration % 60:D2}"; // Formatted duration
+            public string description { get; set; } // Description of entry
+            public string createdAt { get; set; } // Creation date of entry
 
             public string FormattedCreatedAt
             {
@@ -397,7 +393,7 @@ namespace MauiApp3.Components
                 {
                     if (DateTime.TryParse(createdAt, out var date))
                     {
-                        return date.ToString("MM/dd");
+                        return date.ToString("MM/dd"); // Return formatted date
                     }
                     return string.Empty; // Return empty if parsing fails
                 }

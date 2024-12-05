@@ -1,3 +1,5 @@
+<!--Written by Grace and Eric-->
+<!--UI for the Peer Review Page which displays all the Peer Reviews per student -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MauiApp3.Components"
@@ -13,6 +15,7 @@
                         Command="{Binding NavigateToCreatePRQCommand}" Grid.Column="1" />
             </Grid>
 
+            <!-- Binding the student groups to display peer reviews-->
             <CollectionView ItemsSource="{Binding StudentGroups}" SelectionMode="None">
                 <!-- Header for grid -->
                 <CollectionView.Header>
@@ -26,6 +29,7 @@
                     </Grid>
                 </CollectionView.Header>
 
+                <!-- Collection view to hold the list of students -->
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <StackLayout>
@@ -34,7 +38,6 @@
                                 <Label Grid.Column="1" Text="{Binding group}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                 <Label Grid.Column="2" Text="{Binding firstName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                 <Label Grid.Column="3" Text="{Binding lastName}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-                                <!-- Expand/Collapse -->
                                 <Label Grid.Column="4" Text="{Binding NumberReviewsReceived}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:PeerReviewPageViewModel}}, Path=ToggleReviewsReceivedExpandCommand}"
@@ -53,7 +56,7 @@
                             <BoxView HeightRequest="1" BackgroundColor="#D3D3D3" />
 
                             <StackLayout Padding="10" BackgroundColor="White">
-                                <!-- Reviews Received Section -->
+                                <!-- Displaying the Reviews Received Section -->
                                 <StackLayout HorizontalOptions="Center" Margin="30,10,30,10" Padding="5">
                                     <Label Text="{Binding ReviewsReceivedHeader}" 
                                        FontAttributes="Bold" 
@@ -76,7 +79,7 @@
                                                     <!-- Line between reviewer sections -->
                                                     <BoxView HeightRequest="1" BackgroundColor="#D3D3D3" />
 
-                                                    <!-- Nested CollectionView for Answers -->
+                                                    <!-- Nested CollectionView for the actual review answers -->
                                                     <CollectionView ItemsSource="{Binding Answers}" Margin="30,10,30,10" HorizontalOptions="Center">
                                                         <CollectionView.Header>
                                                             <Grid Padding="5" ColumnDefinitions="*,*,*" BackgroundColor="#E8E8E8">
@@ -88,6 +91,7 @@
                                                         <CollectionView.ItemTemplate>
                                                             <DataTemplate>
                                                                 <StackLayout>
+                                                                    <!-- Grid that displays peer reivew question, written and numerical feedback -->
                                                                     <Grid ColumnDefinitions="*,*,*">
                                                                         <Label Grid.Column="0" Text="{Binding Question}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
                                                                         <Label Grid.Column="1" Text="{Binding WrittenFeedback}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
