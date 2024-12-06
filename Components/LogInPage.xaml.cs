@@ -1,3 +1,4 @@
+// Written by Eric and Grace
 namespace MauiApp3;
 using MauiApp3.Components;
 public partial class LogInPage : ContentPage
