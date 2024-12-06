@@ -1,4 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!--  Defines the configuration, settings, dependencies, and resources used to build the application, including target platforms, cross-platform support, and build and run settings. --> 
+<!--  Pre-defined and updated with dotnet commands.  --> 
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
